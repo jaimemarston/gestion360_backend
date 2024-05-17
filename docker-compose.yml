@@ -30,7 +30,7 @@ services:
   db:
     image: postgres
     restart: unless-stopped
-    container_name: container_postgres
+    # container_name: container_postgres
     deploy:
       resources:
         limits:
