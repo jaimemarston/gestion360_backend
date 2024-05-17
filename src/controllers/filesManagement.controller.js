@@ -47,7 +47,6 @@ const bulkUpload = async (req, res) => {
     const uploaded = await fileService.saveBase64ToMinio(object.base64Content, object.filename, FOLDER);
     if (uploaded.error) {
       uploadedFiles.push({ filename: object.filename, error: uploaded.error })
-      console.log(uploaded)
     } else {
       const file = await MinioFiles.create({
         filename: object.filename,
@@ -57,10 +56,8 @@ const bulkUpload = async (req, res) => {
         FolderId: req.folder.id
       })
 
-      console.log(file)
       uploadedFiles.push(formatObject(file));
     }
-
   });
 
   await Promise.all(promises);

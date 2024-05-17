@@ -5,11 +5,15 @@ import { RegistroDocumento, Usuario, registroEmpleado } from '../models/index.js
 import fs from "fs";
 import multer from "multer";
 import {PDFDocument}  from 'pdf-lib';
+import  MinioService from '../minio/minio.service.js';
 
 import {  Op, Sequelize } from "sequelize";
 
 import path from "path";
 import archiver from 'archiver';
+
+const fileService = new MinioService();
+const FOLDER = 'firmas';
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -490,7 +494,6 @@ const documento = await RegistroDocumento.findOne({where:{id:doc.id}})
 const uploadfile = async (req, res, next) => {
   const file = req.file;
   const dni = req.params.dni;
-  console.log(dni)
 
   const extension = file.path.split('.');
   console.log('path=>', extension[1].toLowerCase());
@@ -503,16 +506,20 @@ const uploadfile = async (req, res, next) => {
   file.originalname = firmaComp;
   file.filename = firmaComp;
 
-
   if (!file) {
     const error = new Error('Seleccione un archivo');
     error.httpStatusCode = 400;
     return next(error);
   }
 
+  const fileContent = fs.readFileSync(file.path);
+  const base64Image = Buffer.from(fileContent).toString('base64');
+  const uploaded = await fileService.saveBase64ToMinio(base64Image, file.originalname, FOLDER);
+  fs.unlinkSync(file.path);
+
   try {
 
-const result = await Usuario.findOne({where: {dni: dni}});
+    const result = await Usuario.findOne({where: {dni: dni}});
 
 
     if (!result)
