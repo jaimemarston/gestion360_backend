@@ -1,0 +1,35 @@
+version: '3.5'
+
+services:
+  app:
+    build: .
+    volumes:
+      - ./:/app
+  postgresDB:
+    image: postgres
+    restart: unless-stopped
+    container_name: container_postgres
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /data/postgres
+    volumes:
+      - ./sql:/var/lib/postgresql/data
+    ports:
+      - '5432:${POSTGRES_PORT}'
+
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - 8090:8080
+
+networks:
+  postgresDB:
+  adminer:
+
+volumes:
+  postgresDB:
