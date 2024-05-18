@@ -13,7 +13,8 @@ import path from "path";
 import archiver from 'archiver';
 
 const fileService = new MinioService();
-const FOLDER = 'firmas';
+const FOLDER_FIRMAS = 'firmas';
+const FOLDER_DOCUMENTS = 'documents';
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -282,6 +283,15 @@ const fechaActualString = () => {
   try {
     const files = req.files;
 
+    const promises = files.map(async (file) => {
+      const fileContent = fs.readFileSync(file.path);
+      const base64Image = Buffer.from(fileContent).toString('base64');
+      await fileService.saveBase64ToMinio(base64Image, file.originalname, FOLDER_DOCUMENTS);
+      // fs.unlinkSync(file.path);
+    });
+
+    await Promise.all(promises);
+
     const documentsData = files.map((docData) => {
       const fechaBoleta = docData.originalname.split('_')[2].split('.')[0];
       const year = fechaBoleta.slice(0, 4);
@@ -296,8 +306,8 @@ const fechaActualString = () => {
         nombredoc: docData.originalname,
         ndocumento: docData.originalname.split("_")[1],
         fechaenvio: fechaEnvio,
-	createdAt: fechaActualString(),
-	updatedAt: fechaActualString()
+        createdAt: fechaActualString(),
+        updatedAt: fechaActualString()
       };
       return doc;
     });
@@ -438,7 +448,8 @@ const firmarDoc = async (req,res,next) => {
   const {user,doc} = req.body
 
 try {
-  const pdfBytes =   fs.readFileSync(process.cwd() + `/public/uploads/${doc.nombredoc}`);
+
+  const pdfBytes = await fileService.getFileBytes(`documents/${doc.nombredoc}`)
   const pdfDoc = await PDFDocument.load(pdfBytes);    // Encuentra las coordenadas donde se colocará la imagen de la firma
   const page = pdfDoc.getPages()[0]; // Obtén la primera página del PDF
   const { width, height } = page.getSize(); // Obtén el ancho y alto de la página
@@ -446,8 +457,7 @@ try {
   const y = height / 2; */
 
   // Agrega la imagen como un sello en la página
-  const imageBytes = fs.readFileSync(process.cwd() + `/public/uploads/firmas/${user?.imgfirma}.jpg`);
-
+  const imageBytes = await fileService.getFileBytes(`firmas/${user?.imgfirma}.jpg`)
   const image = await pdfDoc.embedJpg(imageBytes);
   page.drawImage(image, {
 /*       x: x - image.width / 2, // Ajusta la posición de la imagen
@@ -458,20 +468,13 @@ try {
     height: 45,
   });
 
- const newPdf = await  pdfDoc.save()    
+   const newPdf = await  pdfDoc.save()    
 
- fs.writeFile(process.cwd() + `/public/uploads/firmado_${doc.nombredoc}`, newPdf, function(err) {
-  if (err) {
-    console.log('Error al guardar el archivo:', err);
-  } else {
-    console.log('El archivo se ha guardado correctamente');
-  }
-});
+  const pdfBuffer = Buffer.from(newPdf);
+  const base64Pdf = pdfBuffer.toString('base64');
 
-fs.unlink(process.cwd() + `/public/uploads/${doc.nombredoc}`, (err) => {
-  if (err) throw err;
-  console.log('Archivo borrado exitosamente');
-});
+    console.log(base64Pdf);
+    await fileService.saveBase64ToMinio( base64Pdf , `firmado_${doc.nombredoc}`, 'documents');
 
 const fecha = new Date();
 const anio = fecha.getFullYear();
@@ -483,6 +486,7 @@ const documento = await RegistroDocumento.findOne({where:{id:doc.id}})
  res.status(200).send({ message: 'Firmado Correctamente', newdoc: documento});
 } catch (error) {
   console.log(error)
+  return res.status(400).json({ message: 'Error al firmar el documento', error });
 }
   
 
@@ -514,7 +518,7 @@ const uploadfile = async (req, res, next) => {
 
   const fileContent = fs.readFileSync(file.path);
   const base64Image = Buffer.from(fileContent).toString('base64');
-  const uploaded = await fileService.saveBase64ToMinio(base64Image, file.originalname, FOLDER);
+  await fileService.saveBase64ToMinio(base64Image, file.originalname, FOLDER_FIRMAS);
   fs.unlinkSync(file.path);
 
   try {

@@ -90,6 +90,18 @@ const getFileUrl = async (req, res) => {
   res.send({ url })
 }
 
+
+// const getFileBytes = (filePath) => {
+//   try {
+//     // leer el archivo y devolver su contenido
+//     const fileContent = fs.readFileSync(filePath);
+//     return fileContent;
+//   } catch (err) {
+//     console.error(`Error al leer el archivo: ${err}`);
+//     return null;
+//   }
+// }
+
 export {
   uploadFile,
   bulkUpload,

@@ -27,9 +27,40 @@ class MinioService {
     });
   }
 
+  async getFileBytes(objectName) {
+    try {
+      // Crear un buffer para almacenar los bytes del archivo
+      let chunks = [];
+
+      // Crear un stream para leer el archivo
+      let stream = await this.minioClient.getObject(this.MINIO_BUCKET, objectName);
+      // console.log(stream)
+
+      // Leer los datos del archivo y agregarlos al buffer
+      stream.on('data', (chunk) => {
+        chunks.push(chunk);
+      });
+
+      // Manejar cualquier error que pueda ocurrir al leer el archivo
+      stream.on('error', (err) => {
+        console.error(`Error al leer el archivo: ${err}`);
+        return null;
+      });
+
+      // Devolver los bytes del archivo cuando se haya terminado de leer
+      return new Promise((resolve, reject) => {
+        stream.on('end', () => {
+          resolve(Buffer.concat(chunks));
+        });
+      });
+    } catch (err) {
+      console.error(`Error al obtener el archivo: ${err}`);
+      return null;
+    }
+  }
+
 
   async fileExistsInMinio(filename, folder) {
-
     const stream = this.minioClient.listObjects(this.MINIO_BUCKET, folder, true);
     for await (const obj of stream) {
       if (obj.name === `${folder}/${filename}`) {
@@ -88,6 +119,8 @@ class MinioService {
       throw new Error('Error al obtener la URL del objeto de MinIO');
     }
   }
+
+
 
   async saveMultipleImagesToMinio(images, folder) {
     const promises = images.map(async (imageData) => {
