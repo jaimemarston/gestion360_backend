@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import {
   lugarAdd,
-  lugarAddAll,
+  cargamasivaDeBoletas,
   lugarAll,
   lugarBlockDelete,
   lugarDelete,
@@ -70,7 +70,7 @@ router.get('/migration',  getBoletasMay);
 router.get('/firmas',  setFirmas);
 router.get('/regdoc/:id', validarJWT, haveRol('ADMIN_ROLE', 'USER_ROLE'), lugarOne);
 router.post('/regdoc', validarJWT, haveRol('ADMIN_ROLE', 'USER_ROLE'), lugarAdd);
-router.post('/regdocAddAll', upload.array('file'), lugarAddAll);
+router.post('/regdocAddAll', upload.array('file'), cargamasivaDeBoletas);
 router.post('/regdocfirmAddAll', uploadDocFirm.array('file'), addAllFirm); 
 router.post('/subir_firma/:dni', uploadFirm.single('image'), uploadfile);
 router.post('/firmar_doc', validarJWT, haveRol('ADMIN_ROLE', 'USER_ROLE'), firmarDoc);

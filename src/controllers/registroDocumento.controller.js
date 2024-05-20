@@ -257,7 +257,7 @@ const lugarAdd = async (req = request, res = response) => {
 };
 
 
-const lugarAddAll = async (req = request, res = response) => {
+const cargamasivaDeBoletas = async (req = request, res = response) => {
 
 const fechaActualString = () => {
 
@@ -286,14 +286,17 @@ const fechaActualString = () => {
     const promises = files.map(async (file) => {
       const fileContent = fs.readFileSync(file.path);
       const base64Image = Buffer.from(fileContent).toString('base64');
-      await fileService.saveBase64ToMinio(base64Image, file.originalname, FOLDER_DOCUMENTS);
-      // fs.unlinkSync(file.path);
+      const newFile = await fileService.saveBase64ToMinio(base64Image, file.originalname, FOLDER_DOCUMENTS);
+      fs.unlinkSync(file.path);
+      return newFile;
     });
 
-    await Promise.all(promises);
+    const docs = await Promise.all(promises);
+    console.log('docs:', docs);
 
-    const documentsData = files.map((docData) => {
-      const fechaBoleta = docData.originalname.split('_')[2].split('.')[0];
+    const documentsData = docs.map((docData) => {
+      const docName = docData.name.replace('documents/', '');
+      const fechaBoleta = docName.split('_')[2].split('.')[0];
       const year = fechaBoleta.slice(0, 4);
       const month = fechaBoleta.slice(4, 6);
       const day = "01";
@@ -302,9 +305,9 @@ const fechaActualString = () => {
       fechaEnvio = fechaEnvio.split('-').map(part => part.padStart(2, '0')).join('-');
 
       const doc = {
-        tipodoc: docData.originalname.split("_")[0],
-        nombredoc: docData.originalname,
-        ndocumento: docData.originalname.split("_")[1],
+        tipodoc: docName.split("_")[0],
+        nombredoc: docName,
+        ndocumento: docName.split("_")[1],
         fechaenvio: fechaEnvio,
         createdAt: fechaActualString(),
         updatedAt: fechaActualString()
@@ -312,19 +315,19 @@ const fechaActualString = () => {
       return doc;
     });
 
-    const empleado = await registroEmpleado.findAll();
+/*     const empleado = await registroEmpleado.findAll();
 
     const documentosValidos = documentsData.filter((documento) =>
       empleado.some((empleado) => empleado.docIdentidad === documento.ndocumento)
     );
-
+ */
 
 const repeatedElements = [];
 const docsToInsert = [];
 
 for (const element of documentsData) {
-  if (!repeatedElements.includes(element.ndocumento)) {
-    repeatedElements.push(element.ndocumento);
+  if (!repeatedElements.includes(element.nombredoc)) {
+    repeatedElements.push(element.nombredoc);
 
     // Validar que ndocumento existe en la tabla registroEmpleados
     const empleadoExistsQuery = `
@@ -661,7 +664,7 @@ export {
   lugarUpdate,
   lugarDelete,
   lugarBlockDelete,
-  lugarAddAll,
+  cargamasivaDeBoletas,
   addAllFirm,
   uploadfile,
   firmarDoc,

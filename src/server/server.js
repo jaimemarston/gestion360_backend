@@ -30,6 +30,7 @@ class Server {
   constructor() {
     this.app = express();
     this.port = process.env.PORT;
+    this.prefix = '/api';
     this.connection();
     this.middleware();
   } 
@@ -69,26 +70,26 @@ class Server {
   }
 
   routes() {
-    this.app.use('/api', authLogin);
-    this.app.use('/api', registroTipoDocumento);
-    this.app.use('/api', registroEmpleado);
-    this.app.use('/api', solicitudRoutes);
-    this.app.use('/api', solicitudProductoRoutes);
-    this.app.use('/api', rendicionGastos);
-    this.app.use('/api', rendicionGastosProducto);
-    this.app.use('/api', registroActividad);
-    this.app.use('/api', registroProyecto);
-    this.app.use('/api', registroCargo);
-    this.app.use('/api', registroDocumento);
-    this.app.use('/api', lugarComision);
-    this.app.use('/api', registroCodigosReferencia);
-    this.app.use('/api', userRoutes); 
-    this.app.use('/api', registroPresupuestoFinanciero);
-    this.app.use('/api', registroPresupuesto);
-    this.app.use('/api/minio', minioRoutes)
-    this.app.use('/api/categories', categoriesRoute)
-    this.app.use('/api/groups', groupsRoutes)
-    this.app.use('/api/folders', foldersRoute)
+this.app.use(this.prefix, authLogin);
+this.app.use(this.prefix, registroTipoDocumento);
+this.app.use(this.prefix, registroEmpleado);
+this.app.use(this.prefix, solicitudRoutes);
+this.app.use(this.prefix, solicitudProductoRoutes);
+this.app.use(this.prefix, rendicionGastos);
+this.app.use(this.prefix, rendicionGastosProducto);
+this.app.use(this.prefix, registroActividad);
+this.app.use(this.prefix, registroProyecto);
+this.app.use(this.prefix, registroCargo);
+this.app.use(this.prefix, registroDocumento);
+this.app.use(this.prefix, lugarComision);
+this.app.use(this.prefix, registroCodigosReferencia);
+this.app.use(this.prefix, userRoutes); 
+this.app.use(this.prefix, registroPresupuestoFinanciero);
+this.app.use(this.prefix, registroPresupuesto);
+this.app.use(`${this.prefix}/minio`, minioRoutes)
+this.app.use(`${this.prefix}/categories`, categoriesRoute)
+this.app.use(`${this.prefix}/groups`, groupsRoutes)
+this.app.use(`${this.prefix}/folders`, foldersRoute)
   }
 
   listen() {
