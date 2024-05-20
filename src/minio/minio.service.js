@@ -63,6 +63,8 @@ class MinioService {
   async fileExistsInMinio(filename, folder) {
     const stream = this.minioClient.listObjects(this.MINIO_BUCKET, folder, true);
     for await (const obj of stream) {
+      console.log({obj})
+      console.log('DEBUG:',`${folder}/${filename}`)
       if (obj.name === `${folder}/${filename}`) {
         return true;
       }
@@ -77,10 +79,11 @@ class MinioService {
       return { response: null, name: null, error: 'Invalid base64 data or folder'}
     }
 
-    const fileExists = await this.fileExistsInMinio(filename, folder);
-    if (fileExists) {
-      return { response: null, name: null, error: 'El archivo ya existe'}
-    }
+    // const fileExists = await this.fileExistsInMinio(filename, folder);
+    // console.log({fileExists})
+    // if (fileExists) {
+    //   return { response: null, name: null, error: 'El archivo ya existe'}
+    // }
 
     const fileBuffer = Buffer.from(base64Data, 'base64');
     const fileName = `${folder}/${filename}`;

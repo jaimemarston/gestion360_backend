@@ -86,7 +86,8 @@ const getFilesUrl = async (req, res) => {
 
 const getFileUrl = async (req, res) => {
   const name = req.params[0];
-  const url = await fileService.getFileUrl(`${FOLDER}/${name}`)
+  // return res.send(name);
+  const url = await fileService.getFileUrl(`${name}`)
   res.send({ url })
 }
 

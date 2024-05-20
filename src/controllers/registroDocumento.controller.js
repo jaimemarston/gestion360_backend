@@ -518,7 +518,7 @@ const uploadfile = async (req, res, next) => {
 
   const fileContent = fs.readFileSync(file.path);
   const base64Image = Buffer.from(fileContent).toString('base64');
-  await fileService.saveBase64ToMinio(base64Image, file.originalname, FOLDER_FIRMAS);
+  await fileService.saveBase64ToMinio(base64Image,  `${file.originalname}.jpg`, FOLDER_FIRMAS);
   fs.unlinkSync(file.path);
 
   try {
