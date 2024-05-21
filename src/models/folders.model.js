@@ -15,6 +15,6 @@ export const Folders = sequelize.define('Folders', {
   },
   label3: {
     type: DataTypes.STRING,
-  },
+  }
 });
 

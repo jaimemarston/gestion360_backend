@@ -17,7 +17,7 @@ import { registroEmpleado} from './registroEmpleado.model.js'
 import { RegistroDocumento } from './registroDocumento.model.js';
 import { Solicitud } from './solicitud.model.js';
 import { RegistroProyecto } from './registroProyecto.model.js';
-import { Groups } from './groups.mode.js';
+import { Groups } from './groups.model.js';
 import { Usuario } from './user.model.js';
 import { Folders } from './folders.model.js';
 import { MinioFiles } from './minioFiles.model.js';
@@ -31,20 +31,19 @@ RegistroDocumento.belongsTo(registroEmpleado, { foreignKey: 'ndocumento' });
 Usuario.hasMany(Groups);
 Groups.belongsTo(Usuario); 
 
+Groups.hasMany(Folders, { as: 'folders' }); // Added line
 Folders.belongsTo(Groups);
 Folders.belongsTo(Usuario);
-
+Folders.hasMany(MinioFiles, { as: 'documents' });
 MinioFiles.belongsTo(Folders);
 MinioFiles.belongsTo(Usuario);
 
 export { Folders } from './folders.model.js';
-export { Groups } from './groups.mode.js';
+export { Groups } from './groups.model.js';
 export { registroEmpleado} from './registroEmpleado.model.js'
 export { RegistroDocumento } from './registroDocumento.model.js';
 export { Solicitud } from './solicitud.model.js';
 // export { RegistroProyecto } from './registroProyecto.model.js';
 export { RegistroProyecto } from './registroProyecto.model.js';
-export { Categories } from './categories.model.js';
-export { Subcategories } from './subcategories.model.js';
 export { Sections } from './section.model.js';
 export { MinioFiles } from './minioFiles.model.js';

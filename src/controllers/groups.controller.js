@@ -1,4 +1,4 @@
-import { Groups } from '../models/index.js'
+import { Folders, Groups, MinioFiles } from '../models/index.js'
 
 function formatObject(group) {
   return {
@@ -13,13 +13,33 @@ async function findByName(name) {
 }
 
 const getOne = async (req, res) => {
-  return res.status(200).json( formatObject(req.group) )
+  return res.status(200).json(formatObject(req.group))
 }
 
-const getAll = async (req, res) => {
+/* const getAll = async (req, res) => {
   const query = await Groups.findAll();
   const groups = query.map(group => formatObject(group))
-  return res.status(200).json( groups )
+  return res.status(200).json(groups)
+} */
+
+const getAll = async (req, res) => {
+  const groupsWithFoldersAndDocuments = await Groups.findAll({
+    include: [
+      {
+        model: Folders,
+        as: 'folders',
+        include: [
+          {
+            model: MinioFiles,
+            as: 'documents',
+            // Aquí puedes agregar condiciones adicionales para los documentos si lo necesitas
+          },
+        ],
+      },
+    ],
+  });
+
+  return res.status(200).json(groupsWithFoldersAndDocuments)
 }
 
 const create = async (req, res) => {
@@ -29,7 +49,7 @@ const create = async (req, res) => {
     return res.status(400).send({ message: 'el grupo ya existe' })
   }
 
-  const group = await Groups.create({ name: req.body.name, usuarioid: req.usuario.id })
+  const group = await Groups.create({ name: req.body.name })
 
   return res.status(201).send({ message: 'se ha creado con éxito', group: formatObject(group) })
 }
