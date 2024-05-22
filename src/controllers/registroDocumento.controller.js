@@ -465,8 +465,8 @@ try {
   page.drawImage(image, {
 /*       x: x - image.width / 2, // Ajusta la posición de la imagen
     y: y - image.height / 2, */
-    x: 70,
-    y: 60 ,
+    x: 200,
+    y: 130,
     width: 45,
     height: 45,
   });
@@ -476,7 +476,6 @@ try {
   const pdfBuffer = Buffer.from(newPdf);
   const base64Pdf = pdfBuffer.toString('base64');
 
-    console.log(base64Pdf);
     await fileService.saveBase64ToMinio( base64Pdf , `firmado_${doc.nombredoc}`, 'documents');
 
 const fecha = new Date();
