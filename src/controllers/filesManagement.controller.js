@@ -18,7 +18,6 @@ const formatObject = (object) => {
 const uploadFile = async (req, res) => {
 
   try {
-
     const uploaded = await fileService.saveBase64ToMinio(req.body.base64Content, req.body.filename, FOLDER);
     if (uploaded.error)
       return res.status(500).send({ message: uploaded.error })

@@ -8,6 +8,7 @@ import { checkFolderId } from './folders/check-folder-id.middleware.js'
 import { checkFilesBody } from './files/check-body.middleware.js'
 import { checkFilesBodyBulk } from './files/check-body-bulk.middleware.js'
 import { checkUserId } from './users/check-user-id.middleware.js'
+import { ownerOrAsociated } from './folders/validate-owner-or-asociated.middleware.js'
 
 export { 
     validarJWT, 
@@ -19,5 +20,6 @@ export {
     checkFolderId, 
     checkFilesBody, 
     checkFilesBodyBulk, 
-    checkUserId
+    checkUserId,
+    ownerOrAsociated,
 };
