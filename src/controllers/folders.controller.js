@@ -1,4 +1,5 @@
 import { Folders } from '../models/index.js'
+import { FoldersUsers } from '../models/index.js'
 
 function formatObject(folder) {
   return  {
@@ -47,10 +48,46 @@ const remove = async (req, res) => {
   return res.send({ message: 'Se ha eliminado con éxito' })
 }
 
+const addUserToFolder = async (req, res) => {
+
+  const data = {
+    usuarioId: req.user.id,
+    FolderId: req.folder.id
+  };
+
+  const alreadyAdded = await FoldersUsers.findOne({ where: data });
+  if (alreadyAdded) {
+    return res.status(400).send({ message: 'Usuario ya agregado a la carpeta' });
+  }
+
+  await FoldersUsers.create(data);
+
+  return res.status(200).send({ message: 'Usuario agregado a la carpeta' });
+}
+
+const removeUserToFolder = async (req, res) => {
+
+  const data = {
+    usuarioId: req.user.id,
+    FolderId: req.folder.id
+  };
+
+  const userInFolder = await FoldersUsers.findOne({ where: data });
+  if (!userInFolder) {
+    return res.status(400).send({ message: 'Usuario no se encuentra asociado a la carpeta' });
+  }
+
+  await userInFolder.destroy()
+
+  return res.status(200).send({ message: 'Usuario eliminado de la carpeta correctamente' });
+}
+
 export {
   create,
   update,
   remove,
   getOne,
-  getAll
+  getAll,
+  addUserToFolder,
+  removeUserToFolder,
 }

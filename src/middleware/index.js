@@ -7,5 +7,17 @@ import { checkGroupId } from './folders/check-group-id.middleware.js'
 import { checkFolderId } from './folders/check-folder-id.middleware.js'
 import { checkFilesBody } from './files/check-body.middleware.js'
 import { checkFilesBodyBulk } from './files/check-body-bulk.middleware.js'
+import { checkUserId } from './users/check-user-id.middleware.js'
 
-export { validarJWT, haveRol , checkName, checkId, checkBody, checkGroupId, checkFolderId, checkFilesBody, checkFilesBodyBulk };
+export { 
+    validarJWT, 
+    haveRol, 
+    checkName, 
+    checkId, 
+    checkBody, 
+    checkGroupId, 
+    checkFolderId, 
+    checkFilesBody, 
+    checkFilesBodyBulk, 
+    checkUserId
+};

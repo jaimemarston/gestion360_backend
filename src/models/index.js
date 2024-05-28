@@ -20,6 +20,7 @@ import { RegistroProyecto } from './registroProyecto.model.js';
 import { Groups } from './groups.model.js';
 import { Usuario } from './user.model.js';
 import { Folders } from './folders.model.js';
+import { FoldersUsers } from './folders-users.model.js';
 import { MinioFiles } from './minioFiles.model.js';
 
 RegistroProyecto.hasMany(Solicitud,  { onDelete: 'RESTRICT' }); 
@@ -38,6 +39,10 @@ Folders.hasMany(MinioFiles, { as: 'documents' });
 MinioFiles.belongsTo(Folders);
 MinioFiles.belongsTo(Usuario);
 
+Usuario.belongsToMany(Folders, { through: FoldersUsers });
+Folders.belongsToMany(Usuario, { through: FoldersUsers });
+
+export { FoldersUsers } from './folders-users.model.js';
 export { Folders } from './folders.model.js';
 export { Groups } from './groups.model.js';
 export { registroEmpleado} from './registroEmpleado.model.js'
