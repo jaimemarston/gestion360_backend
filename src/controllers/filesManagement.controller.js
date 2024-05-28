@@ -91,6 +91,38 @@ const getFileUrl = async (req, res) => {
   res.send({ url })
 }
 
+const getFilesByFolder = async (req, res) => {
+
+  const urls = {};
+  const files = await MinioFiles.findAll({ where: { FolderId: req.folder.id } });
+
+  const promises = files.map(async (file) => {
+    const url = await fileService.getFileUrl(`${FOLDER}/${file.filename}`)
+
+    return {
+      url,
+      ...file
+    }
+  });
+
+  const result = await Promise.all(promises);
+  const formatted = result.map((object) => {
+
+    return {
+      id: object.dataValues.id,
+      filename: object.dataValues.filename,
+      mimetype: object.dataValues.mimetype,
+      tags: object.dataValues.tags,
+      url: object.url,
+      createdAt: object.dataValues.createdAt,
+      updatedAt: object.dataValues.updatedAt,
+    }
+
+  });
+
+  return res.send({data: formatted})
+}
+
 
 // const getFileBytes = (filePath) => {
 //   try {
@@ -107,5 +139,6 @@ export {
   uploadFile,
   bulkUpload,
   getFileUrl,
-  getFilesUrl
+  getFilesUrl,
+  getFilesByFolder
 }

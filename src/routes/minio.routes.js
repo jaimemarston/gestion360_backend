@@ -3,7 +3,8 @@ import {
   uploadFile,
   bulkUpload,
   getFileUrl,
-  getFilesUrl
+  getFilesUrl,
+  getFilesByFolder
 } from '../controllers/filesManagement.controller.js';
 import { validarJWT, checkFolderId, checkFilesBody, checkFilesBodyBulk } from '../middleware/index.js';
 
@@ -14,5 +15,7 @@ router.post('/:folderId/bulk-upload', validarJWT, checkFolderId, checkFilesBodyB
 
 router.get('/get-file-url/*', getFileUrl);
 router.get('/get-files', getFilesUrl);
+router.get('/get-files-by-folder/:folderId', validarJWT, checkFolderId, getFilesByFolder);
+
 
 export default router;
