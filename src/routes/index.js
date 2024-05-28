@@ -10,7 +10,6 @@
 import userRoutes from './user.routes.js';
 import authLogin from './auth.routes.js';
 import minioRoutes from './minio.routes.js';
-import categoriesRoute from './categories.routes.js';
 import registroEmpleado from './registroEmpleado.routes.js';
 import solicitudRoutes from './solicitud.routes.js';
 import solicitudProductoRoutes from './solicitudProducto.routes.js';
@@ -47,7 +46,6 @@ export {
   registroTipoDocumento,
   registroPresupuesto,
   minioRoutes,
-  categoriesRoute,
   groupsRoutes,
   foldersRoute
 };

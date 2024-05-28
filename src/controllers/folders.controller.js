@@ -25,7 +25,15 @@ const getAll = async (req, res) => {
 }
 
 const create = async (req, res) => {
-  const folder = await Folders.create({...req.body, usuarioId: req.usuario.id, GroupId: req.group.id })
+
+  const folder = await Folders.create({ 
+    usuarioId: req.usuario.id,
+     GroupId: req.body.groupId,
+     label1: req.body.label1,
+     label2: req.body.label2,
+     label3: req.body.label3,
+    })
+  
   return res.status(201).send({ message: 'se ha creado con éxito', folder: formatObject(folder) })
 }
 

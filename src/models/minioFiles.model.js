@@ -1,6 +1,5 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../database/db.js';
-import { RendicionGastosProducto } from './rendicionGastosProducto.model.js';
 
 export const MinioFiles = sequelize.define('minioFiles', {
   id: {

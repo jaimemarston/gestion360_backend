@@ -21,7 +21,6 @@ import {
   registroTipoDocumento,
   registroPresupuesto,
   minioRoutes,
-  categoriesRoute,
   groupsRoutes,
   foldersRoute
 } from '../routes/index.js';
@@ -37,7 +36,7 @@ class Server {
 
   connection = async () => {
     try {
-      // await sequelize.sync({ force: false, alter: false});
+     // await sequelize.sync({ force: true, alter: true});
      
       await sequelize.authenticate();
       console.log(`========= <> Conectado la database <> =========`);
@@ -87,7 +86,6 @@ this.app.use(this.prefix, userRoutes);
 this.app.use(this.prefix, registroPresupuestoFinanciero);
 this.app.use(this.prefix, registroPresupuesto);
 this.app.use(`${this.prefix}/minio`, minioRoutes)
-this.app.use(`${this.prefix}/categories`, categoriesRoute)
 this.app.use(`${this.prefix}/groups`, groupsRoutes)
 this.app.use(`${this.prefix}/folders`, foldersRoute)
   }
