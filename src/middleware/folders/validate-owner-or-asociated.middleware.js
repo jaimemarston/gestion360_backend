@@ -8,8 +8,6 @@ const ownerOrAsociated = async (req, res, next) => {
   // Check if user is asociated to the folder
   const userAsociatedToFolder = await FoldersUsers.findOne({ where: { usuarioId: req.usuario.id, FolderId: req.folder.id } })
 
-  console.log(userIsOwner || userAsociatedToFolder);
-
   if (userIsOwner || userAsociatedToFolder) { 
     next();
   }else {
