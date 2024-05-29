@@ -5,6 +5,15 @@ const fileService = new MinioService();
 const FOLDER = 'files';
 
 const formatObject = (object) => {
+
+  if (object.error) {
+    console.log('testrubg');
+    return {
+      filename: object.filename,
+      error: object.error
+    }
+  }
+
   return {
     id: object.id,
     filename: object.filename,
@@ -18,7 +27,13 @@ const formatObject = (object) => {
 const uploadFile = async (req, res) => {
 
   try {
+
     const filename = `${req.folder.id}/${req.body.filename}`;
+    const fileAlreadyExists = await fileService.fileExistsInMinio(filename, FOLDER);
+    if (fileAlreadyExists) {
+      return res.status(400).send({ message: 'El archivo ya existe' })
+    }
+
     const uploaded = await fileService.saveBase64ToMinio(req.body.base64Content, filename, FOLDER);
     if (uploaded.error)
       return res.status(500).send({ message: uploaded.error })
@@ -42,9 +57,15 @@ const bulkUpload = async (req, res) => {
   const files = req.body.files;
   const uploadedFiles = [];
 
-  const promises = files.map(async (object) => {
+  for (const object of files) {
 
     const filename = `${req.folder.id}/${object.filename}`;
+    const fileAlreadyExists = await fileService.fileExistsInMinio(filename, FOLDER);
+    if (fileAlreadyExists) {
+      uploadedFiles.push({ filename: object.filename, error: 'el archivo ya existe' })
+      continue;
+    }
+
     const uploaded = await fileService.saveBase64ToMinio(object.base64Content, filename, FOLDER);
     if (uploaded.error) {
       uploadedFiles.push({ filename: object.filename, error: uploaded.error })
@@ -59,9 +80,8 @@ const bulkUpload = async (req, res) => {
 
       uploadedFiles.push(formatObject(file));
     }
-  });
 
-  await Promise.all(promises);
+  }
 
   const hasErrors = uploadedFiles.some((file) => file.error !== undefined)
 

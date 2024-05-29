@@ -63,8 +63,8 @@ class MinioService {
   async fileExistsInMinio(filename, folder) {
     const stream = this.minioClient.listObjects(this.MINIO_BUCKET, folder, true);
     for await (const obj of stream) {
-      console.log({obj})
-      console.log('DEBUG:',`${folder}/${filename}`)
+      // console.log({obj})
+      // console.log('DEBUG:',`${folder}/${filename}`)
       if (obj.name === `${folder}/${filename}`) {
         return true;
       }
