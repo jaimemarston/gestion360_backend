@@ -18,7 +18,8 @@ const formatObject = (object) => {
 const uploadFile = async (req, res) => {
 
   try {
-    const uploaded = await fileService.saveBase64ToMinio(req.body.base64Content, req.body.filename, FOLDER);
+    const filename = `${req.folder.id}/${req.body.filename}`;
+    const uploaded = await fileService.saveBase64ToMinio(req.body.base64Content, filename, FOLDER);
     if (uploaded.error)
       return res.status(500).send({ message: uploaded.error })
 
@@ -43,7 +44,8 @@ const bulkUpload = async (req, res) => {
 
   const promises = files.map(async (object) => {
 
-    const uploaded = await fileService.saveBase64ToMinio(object.base64Content, object.filename, FOLDER);
+    const filename = `${req.folder.id}/${object.filename}`;
+    const uploaded = await fileService.saveBase64ToMinio(object.base64Content, filename, FOLDER);
     if (uploaded.error) {
       uploadedFiles.push({ filename: object.filename, error: uploaded.error })
     } else {
@@ -85,18 +87,17 @@ const getFilesUrl = async (req, res) => {
 
 const getFileUrl = async (req, res) => {
   const name = req.params[0];
-  // return res.send(name);
   const url = await fileService.getFileUrl(`${name}`)
   res.send({ url })
 }
 
 const getFilesByFolder = async (req, res) => {
 
-  const urls = {};
   const files = await MinioFiles.findAll({ where: { FolderId: req.folder.id } });
 
   const promises = files.map(async (file) => {
-    const url = await fileService.getFileUrl(`${FOLDER}/${file.filename}`)
+    const filename = `${req.folder.id}/${file.filename}`;
+    const url = await fileService.getFileUrl(`${FOLDER}/${filename}`)
 
     return {
       url,
@@ -123,6 +124,19 @@ const getFilesByFolder = async (req, res) => {
 }
 
 
+const deleteFile = async (req, res) => {
+
+  try {
+    req.file.destroy();
+    await fileService.getFileUrl(FOLDER, req.file.filename);
+    return res.send({ message: 'Archivo eliminado correctamente' });
+  } catch (error) {
+    return res.status(500).send({ message: 'Ocurrio un error al intentar eliminar el archivo' });
+  }
+
+}
+
+
 // const getFileBytes = (filePath) => {
 //   try {
 //     // leer el archivo y devolver su contenido
@@ -139,5 +153,6 @@ export {
   bulkUpload,
   getFileUrl,
   getFilesUrl,
-  getFilesByFolder
+  getFilesByFolder,
+  deleteFile
 }

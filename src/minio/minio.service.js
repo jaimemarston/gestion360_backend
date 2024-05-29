@@ -105,6 +105,16 @@ class MinioService {
     }
   }
 
+
+  async deleteFile(filename, folder) {
+    try {
+      await this.minioClient.removeObject(this.MINIO_BUCKET, `${folder}/${filename}`);
+    } catch (error) {
+      this.logger.error(`Error deleting images from MinIO: ${error}`);
+      return { response: null, name: null, error: 'Failed to delete product images from MinIO'}
+    }
+  }
+
   async getFileUrl(objectName) {
     try {
       const url = await this.minioClient.presignedGetObject(

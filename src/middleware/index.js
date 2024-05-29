@@ -9,17 +9,21 @@ import { checkFilesBody } from './files/check-body.middleware.js'
 import { checkFilesBodyBulk } from './files/check-body-bulk.middleware.js'
 import { checkUserId } from './users/check-user-id.middleware.js'
 import { ownerOrAsociated } from './folders/validate-owner-or-asociated.middleware.js'
+import { checkFileId } from './files/check-file-id.middleware.js'
+import { fileOwnerOrFolderOwner } from './files/check-file-owner-or-folder-owner.middleware.js'
 
 export { 
-    validarJWT, 
-    haveRol, 
-    checkName, 
-    checkId, 
-    checkBody, 
-    checkGroupId, 
-    checkFolderId, 
-    checkFilesBody, 
-    checkFilesBodyBulk, 
-    checkUserId,
-    ownerOrAsociated,
+  validarJWT, 
+  haveRol, 
+  checkName, 
+  checkId, 
+  checkBody, 
+  checkGroupId, 
+  checkFolderId, 
+  checkFilesBody, 
+  checkFilesBodyBulk, 
+  checkUserId,
+  ownerOrAsociated,
+  checkFileId,
+  fileOwnerOrFolderOwner,
 };
