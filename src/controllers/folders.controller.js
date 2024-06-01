@@ -1,5 +1,6 @@
-import { Folders } from '../models/index.js'
-import { FoldersUsers } from '../models/index.js'
+import { Folders, FoldersUsers, Usuario } from '../models/index.js'
+import {  Sequelize } from "sequelize";
+// import { FoldersUsers } from '../models/index.js'
 
 function formatObject(folder) {
   return  {
@@ -82,6 +83,36 @@ const removeUserToFolder = async (req, res) => {
   return res.status(200).send({ message: 'Usuario eliminado de la carpeta correctamente' });
 }
 
+const getUserFolders = async (req, res) => {
+
+  try {
+   const usuarioConCarpetas = await Usuario.findOne({
+     where: { id: req.usuario.id },
+     include: [
+       {
+         model: Folders,
+         as: 'Folders',
+         through: { model: FoldersUsers },
+       },
+     ],
+   });
+
+   const foldersAsociatedUsers = usuarioConCarpetas.Folders.map(folder => formatObject(folder))
+   let foldersOwnedByUser = await Folders.findAll({ where: { usuarioId: req.usuario.id } })
+   foldersOwnedByUser.map(folder => formatObject(folder))
+
+   const uniqueFoldersAsociated = foldersAsociatedUsers.filter( (item) => foldersOwnedByUser.includes(item) ? false : true)
+
+   foldersOwnedByUser = foldersOwnedByUser.map(folder => formatObject(folder))
+   return res.json({ data: uniqueFoldersAsociated.concat(foldersOwnedByUser) })
+
+    // return res.json({ data: folders })
+  } catch (error) {
+    return res.status(500).send({ message: error.message });
+  }
+
+}
+
 export {
   create,
   update,
@@ -90,4 +121,5 @@ export {
   getAll,
   addUserToFolder,
   removeUserToFolder,
+  getUserFolders,
 }
