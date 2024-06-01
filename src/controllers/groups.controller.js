@@ -20,6 +20,13 @@ const getOne = async (req, res) => {
       {
         model: Folders,
         as: 'folders',
+        include: [
+          {
+            model: MinioFiles,
+            as: 'documents',
+            // Aquí puedes agregar condiciones adicionales para los documentos si lo necesitas
+          },
+        ],
       },
     ],
   });
@@ -39,6 +46,13 @@ const getAll = async (req, res) => {
       {
         model: Folders,
         as: 'folders',
+        include: [
+          {
+            model: miniofiles,
+            as: 'documents',
+            // aquí puedes agregar condiciones adicionales para los documentos si lo necesitas
+          },
+        ],
       },
     ],
   });
