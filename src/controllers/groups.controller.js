@@ -48,7 +48,7 @@ const getAll = async (req, res) => {
         as: 'folders',
         include: [
           {
-            model: miniofiles,
+            model: MinioFiles,
             as: 'documents',
             // aquí puedes agregar condiciones adicionales para los documentos si lo necesitas
           },
