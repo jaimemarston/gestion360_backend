@@ -13,7 +13,18 @@ async function findByName(name) {
 }
 
 const getOne = async (req, res) => {
-  return res.status(200).json(formatObject(req.group))
+  
+  const groupsWithFoldersAndDocuments = await Groups.findAll({
+    where: { id: req.group.id },
+    include: [
+      {
+        model: Folders,
+        as: 'folders',
+      },
+    ],
+  });
+
+  return res.status(200).json(groupsWithFoldersAndDocuments)
 }
 
 /* const getAll = async (req, res) => {
@@ -28,13 +39,6 @@ const getAll = async (req, res) => {
       {
         model: Folders,
         as: 'folders',
-        include: [
-          {
-            model: MinioFiles,
-            as: 'documents',
-            // Aquí puedes agregar condiciones adicionales para los documentos si lo necesitas
-          },
-        ],
       },
     ],
   });

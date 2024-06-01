@@ -48,7 +48,7 @@ class Server {
 
   middleware() {
     this.app.use(cors());
-    this.app.use(express.json());
+    this.app.use(express.json({limit: '5gb'}));
     this.app.use(express.static('public'));
     this.app.use(expressWinston.logger({
       transports: [
@@ -88,8 +88,8 @@ this.app.use(this.prefix, registroPresupuesto);
 this.app.use(`${this.prefix}/minio`, minioRoutes)
 this.app.use(`${this.prefix}/groups`, groupsRoutes)
 this.app.use(`${this.prefix}/folders`, foldersRoute)
-  }
 
+  }
   listen() {
     this.app.listen(this.port, () => {
       console.log(`========= <> Conectado al servidor <> =========`);
