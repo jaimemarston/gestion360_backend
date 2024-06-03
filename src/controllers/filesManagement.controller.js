@@ -1,4 +1,5 @@
 import  MinioService from '../minio/minio.service.js';
+import { v4 as uuidv4 } from 'uuid';
 import {  MinioFiles } from '../models/index.js';
 const fileService = new MinioService();
 
@@ -19,6 +20,7 @@ const formatObject = (object) => {
     filename: object.filename,
     mimetype: object.mimetype,
     tags: object.tags,
+    uuid: object.uuid,
     usuarioId: object.usuarioId,
     FolderId: object.FolderId
   }
@@ -38,10 +40,18 @@ const uploadFile = async (req, res) => {
     if (uploaded.error)
       return res.status(500).send({ message: uploaded.error })
 
+    let uuid;
+    let uuidExists;
+    do {
+      uuid = uuidv4();
+      uuidExists = await MinioFiles.findOne({ where: { uuid } });
+    } while (uuidExists);
+
     const file = await MinioFiles.create({
       filename: req.body.filename,
       mimetype: req.body.mimetype,
       tags: req.body.tags ? req.body.tags : [],
+      uuid,
       usuarioId: req.usuario.id,
       FolderId: req.folder.id
     })
@@ -70,10 +80,20 @@ const bulkUpload = async (req, res) => {
     if (uploaded.error) {
       uploadedFiles.push({ filename: object.filename, error: uploaded.error })
     } else {
+
+
+      let uuid;
+      let uuidExists;
+      do {
+        uuid = uuidv4();
+        uuidExists = await MinioFiles.findOne({ where: { uuid } });
+      } while (uuidExists);
+
       const file = await MinioFiles.create({
         filename: object.filename,
         mimetype: object.mimetype,
         tags: object.tags ? object.tags : [],
+        uuid,
         usuarioId: req.usuario.id,
         FolderId: req.folder.id
       })

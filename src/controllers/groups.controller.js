@@ -1,8 +1,10 @@
 import { Folders, Groups, MinioFiles } from '../models/index.js'
+import { v4 as uuidv4 } from 'uuid';
 
 function formatObject(group) {
   return {
     id: group.id,
+    uuid: group.uuid,
     name: group.name,
   }
 }
@@ -67,7 +69,14 @@ const create = async (req, res) => {
     return res.status(400).send({ message: 'el grupo ya existe' })
   }
 
-  const group = await Groups.create({ name: req.body.name })
+  let uuid;
+  let uuidExists;
+  do {
+    uuid = uuidv4();
+    uuidExists = await Groups.findOne({ where: { uuid } });
+  } while (uuidExists);
+
+  const group = await Groups.create({ name: req.body.name, uuid })
 
   return res.status(201).send({ message: 'se ha creado con éxito', group: formatObject(group) })
 }

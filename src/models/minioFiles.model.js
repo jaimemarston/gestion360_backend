@@ -7,6 +7,10 @@ export const MinioFiles = sequelize.define('minioFiles', {
     primaryKey: true,
     autoIncrement: true,
   },
+  uuid: {
+    type: DataTypes.STRING,
+    unique: true,
+  },
   filename: {
     type: DataTypes.STRING,
   },

@@ -1,10 +1,12 @@
 import { Folders, FoldersUsers, Usuario } from '../models/index.js'
+import { v4 as uuidv4 } from 'uuid';
 import {  Sequelize } from "sequelize";
 // import { FoldersUsers } from '../models/index.js'
 
 function formatObject(folder) {
   return  {
     "id": folder.id,
+    "uuid": folder.uuid,
     "label1": folder.label1,
     "label2": folder.label2,
     "label3": folder.label3,
@@ -28,13 +30,21 @@ const getAll = async (req, res) => {
 
 const create = async (req, res) => {
 
+  let uuid;
+  let uuidExists;
+  do {
+    uuid = uuidv4();
+    uuidExists = await Folders.findOne({ where: { uuid } });
+  } while (uuidExists);
+
   const folder = await Folders.create({ 
     usuarioId: req.usuario.id,
-     GroupId: req.body.groupId,
-     label1: req.body.label1,
-     label2: req.body.label2,
-     label3: req.body.label3,
-    })
+    GroupId: req.body.groupId,
+    uuid,
+    label1: req.body.label1,
+    label2: req.body.label2,
+    label3: req.body.label3,
+  })
   
   return res.status(201).send({ message: 'se ha creado con éxito', folder: formatObject(folder) })
 }

@@ -7,6 +7,10 @@ export const Groups = sequelize.define('Groups', {
     primaryKey: true,
     autoIncrement: true,
   },
+  uuid: {
+    type: DataTypes.STRING,
+    unique: true,
+  },
   name: {
     type: DataTypes.STRING,
     unique: true,
