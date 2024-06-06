@@ -61,19 +61,21 @@ const remove = async (req, res) => {
 
 const addUserToFolder = async (req, res) => {
 
-  const data = {
-    usuarioId: req.user.id,
-    FolderId: req.folder.id
-  };
+  const promises = req.usuarios.map( async user => {
+    const data = {
+      usuarioId: user.id,
+      FolderId: req.folder.id
+    };
 
-  const alreadyAdded = await FoldersUsers.findOne({ where: data });
-  if (alreadyAdded) {
-    return res.status(400).send({ message: 'Usuario ya agregado a la carpeta' });
-  }
+    const alreadyAdded = await FoldersUsers.findOne({ where: data });
+    if (!alreadyAdded) {
+      await FoldersUsers.create(data);
+    }
+  });
 
-  await FoldersUsers.create(data);
+  await Promise.all(promises);
 
-  return res.status(200).send({ message: 'Usuario agregado a la carpeta' });
+  return res.status(200).send({ message: 'Usuarios agregado a la carpeta' });
 }
 
 const removeUserToFolder = async (req, res) => {
