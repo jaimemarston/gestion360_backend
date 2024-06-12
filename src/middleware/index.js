@@ -11,6 +11,7 @@ import { checkUserId } from './users/check-user-id.middleware.js'
 import { ownerOrAsociated } from './folders/validate-owner-or-asociated.middleware.js'
 import { checkFileId } from './files/check-file-id.middleware.js'
 import { fileOwnerOrFolderOwner } from './files/check-file-owner-or-folder-owner.middleware.js'
+import { checkUsersId } from './users/check-users-id.middleware.js'
 
 export { 
   validarJWT, 
@@ -26,4 +27,5 @@ export {
   ownerOrAsociated,
   checkFileId,
   fileOwnerOrFolderOwner,
+  checkUsersId
 };
