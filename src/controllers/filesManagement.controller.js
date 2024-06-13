@@ -167,9 +167,13 @@ const getFilesByFolder = async (req, res) => {
 const deleteFile = async (req, res) => {
 
   try {
+    const filename = `${req.folder.id}/${req.file.filename}`;
+
     req.file.destroy();
-    await fileService.getFileUrl(FOLDER, req.file.filename);
+    await fileService.deleteFile(filename, FOLDER);
+
     return res.send({ message: 'Archivo eliminado correctamente' });
+
   } catch (error) {
     return res.status(500).send({ message: 'Ocurrio un error al intentar eliminar el archivo' });
   }
