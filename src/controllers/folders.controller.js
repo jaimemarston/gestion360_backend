@@ -29,7 +29,6 @@ const getAll = async (req, res) => {
 }
 
 const create = async (req, res) => {
-
   let uuid;
   let uuidExists;
   do {
@@ -45,6 +44,35 @@ const create = async (req, res) => {
     label2: req.body.label2,
     label3: req.body.label3,
   })
+
+  if (req.body.user_ids) {
+
+    // Remove the user that is creating the folder
+    const ids = req.body.user_ids.filter(id => id !== req.usuario.id)
+
+    const usuarios = await Usuario.findAll({
+      where: {
+        id: {
+          [Sequelize.Op.in]: ids
+        }
+      }
+    });
+
+    const promises = usuarios.map( async user => {
+      const data = {
+        usuarioId: user.id,
+        FolderId: folder.id
+      };
+
+      const alreadyAdded = await FoldersUsers.findOne({ where: data });
+      if (!alreadyAdded) {
+        await FoldersUsers.create(data);
+      }
+    });
+
+    await Promise.all(promises);
+
+  }
   
   return res.status(201).send({ message: 'se ha creado con éxito', folder: formatObject(folder) })
 }

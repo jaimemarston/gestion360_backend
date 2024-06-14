@@ -1,6 +1,9 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../database/db.js';
 
+import  MinioService from '../minio/minio.service.js';
+const fileService = new MinioService();
+
 export const MinioFiles = sequelize.define('minioFiles', {
   id: {
     type: DataTypes.INTEGER,
@@ -20,4 +23,12 @@ export const MinioFiles = sequelize.define('minioFiles', {
   tags: {
     type: DataTypes.JSON,
   },
+},
+{
+  hooks: {
+    beforeDestroy: async (parent, options) => {
+      const filename = `${parent.FolderId}/${parent.filename}`;
+      await fileService.deleteFile(filename, 'files');
+    }
+  }
 });

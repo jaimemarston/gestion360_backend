@@ -1,4 +1,5 @@
-import { Folders, Groups, MinioFiles } from '../models/index.js'
+import { Folders, Groups, MinioFiles, FoldersUsers } from '../models/index.js'
+import { USER_ROLE } from '../utils/enums/user-role.enum.js'
 import { v4 as uuidv4 } from 'uuid';
 
 function formatObject(group) {
@@ -43,21 +44,54 @@ const getOne = async (req, res) => {
 } */
 
 const getAll = async (req, res) => {
-  const groupsWithFoldersAndDocuments = await Groups.findAll({
-    include: [
-      {
-        model: Folders,
-        as: 'folders',
-        include: [
-          {
-            model: MinioFiles,
-            as: 'documents',
-            // aquí puedes agregar condiciones adicionales para los documentos si lo necesitas
-          },
-        ],
-      },
-    ],
-  });
+
+  let groupsWithFoldersAndDocuments;
+  console.log(req.usuario.dataValues)
+  console.log(USER_ROLE.ADMIN)
+
+  if (req.usuario.role === USER_ROLE.ADMIN) {
+
+    groupsWithFoldersAndDocuments = await Groups.findAll({
+      include: [
+        {
+          model: Folders,
+          as: 'folders',
+          include: [
+            {
+              model: MinioFiles,
+              as: 'documents',
+              // aquí puedes agregar condiciones adicionales para los documentos si lo necesitas
+            },
+          ],
+        },
+      ],
+    });
+
+  } else {
+
+    const folders = await Folders.findAll({ where: { usuarioId: req.usuario.id }});
+    const asociated = await FoldersUsers.findAll({ where: { usuarioId: req.usuario.id } });
+
+    const folderIds = [...new Set([...folders.map(folder => folder.id), ...asociated.map(folder => folder.id)])];
+
+    groupsWithFoldersAndDocuments = await Groups.findAll({
+      include: [
+        {
+          model: Folders,
+          as: 'folders',
+          where: { id: folderIds },
+          include: [
+            {
+              model: MinioFiles,
+              as: 'documents',
+            },
+          ],
+        },
+      ],
+    });
+
+  }
+
 
   return res.status(200).json(groupsWithFoldersAndDocuments)
 }

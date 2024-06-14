@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import { sequelize } from '../database/db.js';
+import {  MinioFiles, FoldersUsers } from './index.js';
 
 export const Folders = sequelize.define('Folders', {
   id: {
@@ -19,6 +20,14 @@ export const Folders = sequelize.define('Folders', {
   },
   label3: {
     type: DataTypes.STRING,
+  },
+}, {
+    hooks: {
+      beforeDestroy: async (parent, options) => {
+        await MinioFiles.destroy({ where: { FolderId: parent.id }, individualHooks: true });
+        await FoldersUsers.destroy({ where: { FolderId: parent.id }, individualHooks: true })
+      }
+    }
   }
-});
+);
 

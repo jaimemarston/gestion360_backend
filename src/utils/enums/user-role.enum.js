@@ -1,0 +1,5 @@
+export const USER_ROLE = {
+  ADMIN: "ADMIN_ROLE",
+  USER: "USER_ROLE",
+  RESPONSABLE: "RESPONSABLE_ROLE"
+}
