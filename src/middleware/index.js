@@ -12,6 +12,7 @@ import { ownerOrAsociated } from './folders/validate-owner-or-asociated.middlewa
 import { checkFileId } from './files/check-file-id.middleware.js'
 import { fileOwnerOrFolderOwner } from './files/check-file-owner-or-folder-owner.middleware.js'
 import { checkUsersId } from './users/check-users-id.middleware.js'
+import { checkUpdateBody } from './folders/validate-update-body.middleware.js'
 
 export { 
   validarJWT, 
@@ -27,5 +28,6 @@ export {
   ownerOrAsociated,
   checkFileId,
   fileOwnerOrFolderOwner,
-  checkUsersId
+  checkUsersId,
+  checkUpdateBody,
 };
