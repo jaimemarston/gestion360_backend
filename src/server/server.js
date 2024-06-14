@@ -47,10 +47,7 @@ class Server {
   };
 
   middleware() {
-    this.app.use(cors({
-      origin: "*",
-      optionsSuccessStatus: 200
-    }));
+    this.app.use(cors());
     this.app.use(express.json({limit: '5gb'}));
     this.app.use(express.static('public'));
     this.app.use(expressWinston.logger({

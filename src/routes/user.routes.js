@@ -13,7 +13,7 @@ import {
 
 const router = Router();
 
-router.get('/usuario', validarJWT, haveRol('ADMIN_ROLE'), userAll);
+router.get('/usuario', validarJWT, userAll);
 
 router.get('/usuario/create',  userCreate);
 
