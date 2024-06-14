@@ -1,4 +1,5 @@
 import { DataTypes } from 'sequelize';
+import { USER_ROLE } from '../utils/enums/user-role.enum.js'
 import { sequelize } from '../database/db.js';
 
 export const Usuario = sequelize.define('usuarios', {
@@ -36,7 +37,7 @@ export const Usuario = sequelize.define('usuarios', {
     type: DataTypes.STRING,
   },
   rol: {
-    type: DataTypes.ENUM(["ADMIN_ROLE", "USER_ROLE", "RESPONSABLE_ROLE"]),
+    type: DataTypes.ENUM(Object.values(USER_ROLE)),
   },
   estado: {
     type: DataTypes.BOOLEAN,
