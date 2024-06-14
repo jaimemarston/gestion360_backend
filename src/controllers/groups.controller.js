@@ -46,10 +46,12 @@ const getOne = async (req, res) => {
 const getAll = async (req, res) => {
 
   let groupsWithFoldersAndDocuments;
+
   console.log(req.usuario.dataValues)
   console.log(USER_ROLE.ADMIN)
+  console.log(req.usuario.dataValues.rol === USER_ROLE.ADMIN)
 
-  if (req.usuario.role === USER_ROLE.ADMIN) {
+  if (req.usuario.dataValues.rol === USER_ROLE.ADMIN) {
 
     groupsWithFoldersAndDocuments = await Groups.findAll({
       include: [
@@ -60,7 +62,6 @@ const getAll = async (req, res) => {
             {
               model: MinioFiles,
               as: 'documents',
-              // aquí puedes agregar condiciones adicionales para los documentos si lo necesitas
             },
           ],
         },
@@ -69,10 +70,11 @@ const getAll = async (req, res) => {
 
   } else {
 
+
     const folders = await Folders.findAll({ where: { usuarioId: req.usuario.id }});
     const asociated = await FoldersUsers.findAll({ where: { usuarioId: req.usuario.id } });
 
-    const folderIds = [...new Set([...folders.map(folder => folder.id), ...asociated.map(folder => folder.id)])];
+    const folderIds = [...new Set([...folders.map(folder => folder.dataValues.FolderId), ...asociated.map(folder => folder.dataValues.FolderId)])];
 
     groupsWithFoldersAndDocuments = await Groups.findAll({
       include: [

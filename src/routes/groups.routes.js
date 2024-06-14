@@ -9,7 +9,7 @@ import {
 import { validarJWT, haveRol, checkName, checkId} from '../middleware/index.js';
 const router = Router();
 
-router.get('/', validarJWT, haveRol('ADMIN_ROLE'), getAll);
+router.get('/', validarJWT, getAll);
 router.get('/:id', checkId, validarJWT, haveRol('ADMIN_ROLE'), getOne);
 router.post('/', checkName, validarJWT, haveRol('ADMIN_ROLE'), create);
 router.patch('/:id', checkName, validarJWT, haveRol('ADMIN_ROLE'), checkId, update);
