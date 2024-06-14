@@ -74,7 +74,8 @@ const getAll = async (req, res) => {
     const folders = await Folders.findAll({ where: { usuarioId: req.usuario.id }});
     const asociated = await FoldersUsers.findAll({ where: { usuarioId: req.usuario.id } });
 
-    const folderIds = [...new Set([...folders.map(folder => folder.dataValues.FolderId), ...asociated.map(folder => folder.dataValues.FolderId)])];
+
+    const folderIds = [...new Set([...folders.map(folder => folder.dataValues.id), ...asociated.map(folder => folder.dataValues.FolderId)])];
 
     groupsWithFoldersAndDocuments = await Groups.findAll({
       include: [
