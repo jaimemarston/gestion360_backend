@@ -29,6 +29,6 @@ router.patch('/:folderId',  validarJWT, checkFolderId, checkUpdateBody, update);
 router.delete('/:folderId', validarJWT, checkFolderId, remove);
 
 router.post('/add-user/:folderId', validarJWT, checkFolderId, checkUsersId, addUserToFolder);
-router.delete('/remove-user/:folderId/:userId', validarJWT, checkFolderId, checkUserId, removeUserToFolder);
+router.delete('/remove-user/:folderId', validarJWT, checkFolderId, checkUsersId, removeUserToFolder);
 
 export default router;

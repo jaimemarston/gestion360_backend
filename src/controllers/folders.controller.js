@@ -88,6 +88,10 @@ const remove = async (req, res) => {
 
 const addUserToFolder = async (req, res) => {
 
+  if (req.folder.parent !== null) {
+    return res.status(400).send({ message: 'Solo las carpetas raiz pueden recibir usuarios' });
+  }
+   
   const promises = req.usuarios.map( async user => {
     const data = {
       usuarioId: user.id,
@@ -107,19 +111,22 @@ const addUserToFolder = async (req, res) => {
 
 const removeUserToFolder = async (req, res) => {
 
-  const data = {
-    usuarioId: req.user.id,
-    FolderId: req.folder.id
-  };
-
-  const userInFolder = await FoldersUsers.findOne({ where: data });
-  if (!userInFolder) {
-    return res.status(400).send({ message: 'Usuario no se encuentra asociado a la carpeta' });
+  if (req.folder.parent !== null) {
+    return res.status(400).send({ message: 'Solo las carpetas raiz pueden recibir usuarios' });
   }
 
-  await userInFolder.destroy()
+  const promises = req.usuarios.map( async user => {
+    const data = {
+      usuarioId: user.id,
+      FolderId: req.folder.id
+    };
 
-  return res.status(200).send({ message: 'Usuario eliminado de la carpeta correctamente' });
+    await FoldersUsers.destroy({ where: data });
+  });
+
+  await Promise.all(promises);
+
+  return res.status(200).send({ message: 'Usuarios eliminados de la carpeta correctamente' });
 }
 
 const getUserFolders = async (req, res) => {
