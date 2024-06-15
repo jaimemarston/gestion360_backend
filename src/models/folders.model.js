@@ -8,17 +8,15 @@ export const Folders = sequelize.define('Folders', {
     primaryKey: true,
     autoIncrement: true,
   },
+  parent: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
   uuid: {
     type: DataTypes.STRING,
     unique: true,
   },
-  label1: {
-    type: DataTypes.STRING,
-  },
-  label2: {
-    type: DataTypes.STRING,
-  },
-  label3: {
+  label: {
     type: DataTypes.STRING,
   },
 }, {

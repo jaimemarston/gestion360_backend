@@ -7,9 +7,8 @@ function formatObject(folder) {
   return  {
     "id": folder.id,
     "uuid": folder.uuid,
-    "label1": folder.label1,
-    "label2": folder.label2,
-    "label3": folder.label3,
+    "label": folder.label,
+    "parent": folder.parent,
   }
 }
 
@@ -29,6 +28,7 @@ const getAll = async (req, res) => {
 }
 
 const create = async (req, res) => {
+
   let uuid;
   let uuidExists;
   do {
@@ -40,9 +40,8 @@ const create = async (req, res) => {
     usuarioId: req.usuario.id,
     GroupId: req.body.groupId,
     uuid,
-    label1: req.body.label1,
-    label2: req.body.label2,
-    label3: req.body.label3,
+    label: req.body.label,
+    parent: req.parent.id || null
   })
 
   if (req.body.user_ids) {
