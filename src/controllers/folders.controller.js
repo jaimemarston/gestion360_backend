@@ -41,7 +41,7 @@ const create = async (req, res) => {
     GroupId: req.body.groupId,
     uuid,
     label: req.body.label,
-    parent: req.parent.id || null
+    parent: req.parent?.id || null
   })
 
   if (req.body.user_ids) {
