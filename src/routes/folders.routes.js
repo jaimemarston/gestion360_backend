@@ -25,7 +25,7 @@ router.get('/', validarJWT,  getAll);
 router.get('/me', validarJWT, getUserFolders);
 router.get('/:folderId', validarJWT, checkFolderId, getOne);
 router.post('/', validarJWT, checkBody, checkGroupId, checkParentFolder, create);
-router.patch('/:folderId',  validarJWT, checkUpdateBody, checkFolderId, update);
+router.patch('/:folderId',  validarJWT, checkFolderId, checkUpdateBody, update);
 router.delete('/:folderId', validarJWT, checkFolderId, remove);
 
 router.post('/add-user/:folderId', validarJWT, checkFolderId, checkUsersId, addUserToFolder);
