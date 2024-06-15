@@ -41,6 +41,10 @@ const checkParentFolder = async (req, res, next) => {
       return res.status(400).send({ message: 'No puedes crear una carpeta en una carpeta que tiene más de 3 niveles de profundidad' })
     }
 
+    if (req.body.user_ids !== null) {
+      return res.status(400).send({ message: 'No puedes asociarle usuarios a una carpeta hijo' })
+    }
+
     req.parent = parent;
   }
 
