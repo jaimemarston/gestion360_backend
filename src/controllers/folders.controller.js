@@ -22,9 +22,35 @@ const getOne = async (req, res) => {
 }
 
 const getAll = async (req, res) => {
-  const query = await Folders.findAll();
-  const folders = query.map(folder => formatObject(folder))
-  return res.status(200).json( folders )
+    let allFolders = await Folders.findAll();
+
+    let foldersMap = {};
+    allFolders.forEach(folder => {
+        foldersMap[folder.id] = folder;
+        folder.dataValues.children = [];
+    });
+
+    allFolders.forEach(folder => {
+      if (folder.parent) {
+          foldersMap[folder.parent].dataValues.children.push(folder);
+      }
+    });
+
+    const formatObject = (folder) => {
+      return  {
+        "id": folder.id,
+        "uuid": folder.uuid,
+        "label": folder.label,
+        "parent": folder.parent,
+        "children": folder.dataValues.children.map(formatObject) // format children recursively
+      }
+    }
+
+    const formattedFolders = allFolders.map(formatObject);
+
+    const filteredFolders = formattedFolders.filter(folder => folder.parent === null)
+
+    return res.status(200).json(filteredFolders);
 }
 
 const create = async (req, res) => {
