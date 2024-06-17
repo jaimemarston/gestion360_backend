@@ -107,6 +107,17 @@ const getAll = async (req, res) => {
     })
 
 
+    // If admin show all groups, even when they don't have folders
+    if (req.usuario.dataValues.rol === USER_ROLE.ADMIN) {
+      const allGroups = await Groups.findAll();
+
+      const newGroups = allGroups.filter(allGroup => 
+        !result.some(group => group.id === allGroup.id)
+      );
+
+      result.push(...newGroups.map(group => formatObject(group)) );
+    }
+
     return res.status(200).json(result);
 }
 
@@ -124,7 +135,7 @@ const create = async (req, res) => {
     uuidExists = await Groups.findOne({ where: { uuid } });
   } while (uuidExists);
 
-  const group = await Groups.create({ name: req.body.name, uuid })
+  const group = await Groups.create({ name: req.body.name, uuid, usuarioId: req.usuario.id })
 
   return res.status(201).send({ message: 'se ha creado con éxito', group: formatObject(group) })
 }
