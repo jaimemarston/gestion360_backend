@@ -10,6 +10,18 @@ function formatObject(group) {
   }
 }
 
+
+function formatFolder(folder) {
+  return  {
+    "id": folder.id,
+    "uuid": folder.uuid,
+    "label": folder.label,
+    "parent": folder.parent,
+    "group": folder.Group?.toJSON() || null,
+    "children": folder.dataValues.children.map(formatFolder) // format children recursively
+  }
+}
+
 async function findByName(name) {
   const group = await Groups.findOne({ where: { name } })
   return group
@@ -37,66 +49,65 @@ const getOne = async (req, res) => {
   return res.status(200).json(groupsWithFoldersAndDocuments)
 }
 
-/* const getAll = async (req, res) => {
-  const query = await Groups.findAll();
-  const groups = query.map(group => formatObject(group))
-  return res.status(200).json(groups)
-} */
-
 const getAll = async (req, res) => {
 
-  let groupsWithFoldersAndDocuments;
-
-  console.log(req.usuario.dataValues)
-  console.log(USER_ROLE.ADMIN)
-  console.log(req.usuario.dataValues.rol === USER_ROLE.ADMIN)
-
-  if (req.usuario.dataValues.rol === USER_ROLE.ADMIN) {
-
-    groupsWithFoldersAndDocuments = await Groups.findAll({
-      include: [
-        {
-          model: Folders,
-          as: 'folders',
-          include: [
-            {
-              model: MinioFiles,
-              as: 'documents',
-            },
-          ],
-        },
-      ],
+    let allFolders = await Folders.findAll({
+        include: [{
+            model: Groups,
+            as: 'Group'
+        }]
     });
 
-  } else {
-
-
-    const folders = await Folders.findAll({ where: { usuarioId: req.usuario.id }});
-    const asociated = await FoldersUsers.findAll({ where: { usuarioId: req.usuario.id } });
-
-
-    const folderIds = [...new Set([...folders.map(folder => folder.dataValues.id), ...asociated.map(folder => folder.dataValues.FolderId)])];
-
-    groupsWithFoldersAndDocuments = await Groups.findAll({
-      include: [
-        {
-          model: Folders,
-          as: 'folders',
-          where: { id: folderIds },
-          include: [
-            {
-              model: MinioFiles,
-              as: 'documents',
-            },
-          ],
-        },
-      ],
+    let foldersMap = {};
+    allFolders.forEach(folder => {
+        foldersMap[folder.id] = folder;
+        folder.dataValues.children = [];
     });
 
-  }
+    allFolders.forEach(folder => {
+      if (folder.parent) {
+          foldersMap[folder.parent].dataValues.children.push(folder);
+      }
+    });
+
+    const formattedFolders = allFolders.map(formatFolder);
+
+    let filteredFolders = formattedFolders.filter(folder => folder.parent === null)
+
+    // If not admin filter folders by user
+    if (req.usuario.dataValues.rol !== USER_ROLE.ADMIN) {
+      const folders = await Folders.findAll({ where: { usuarioId: req.usuario.id }});
+      const asociated = await FoldersUsers.findAll({ where: { usuarioId: req.usuario.id } });
+
+      const folderIds = [...new Set([...folders.map(folder => folder.dataValues.id), ...asociated.map(folder => folder.dataValues.FolderId)])];
+
+      filteredFolders = formattedFolders.filter(folder => folderIds.includes(folder.id))
+    } 
+
+    const groups = Array.from(
+      filteredFolders
+        .map(rootFolder => formatObject(rootFolder.group) )
+        .reduce((map, group) => map.set(group.id, group), new Map())
+        .values()
+    );
+  
+    const result = groups.map(group => {
+      const rootFolders = filteredFolders.filter(folder => folder.group.id === group.id);
+
+      const rawData = rootFolders.map(folderWithGroup => {
+        const objectCopy = Object.assign({}, folderWithGroup) // For some reason when I try to delete the group property it deletes the property from the original object
+        delete objectCopy.group;
+        return objectCopy
+      });
+
+      return {
+        ...group,
+        folders: rawData
+      }
+    })
 
 
-  return res.status(200).json(groupsWithFoldersAndDocuments)
+    return res.status(200).json(result);
 }
 
 const create = async (req, res) => {
