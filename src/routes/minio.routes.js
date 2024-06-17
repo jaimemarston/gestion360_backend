@@ -6,12 +6,21 @@ import {
   deleteFile,
   getFileUrl,
 } from '../controllers/filesManagement.controller.js';
-import { validarJWT, checkFolderId, checkFilesBody, checkFilesBodyBulk, ownerOrAsociated, checkFileId, fileOwnerOrFolderOwner} from '../middleware/index.js';
+import { 
+  validarJWT,
+  checkFolderId,
+  checkFilesBody,
+  checkFilesBodyBulk,
+  ownerOrAsociated,
+  checkFileId,
+  fileOwnerOrFolderOwner,
+  checkFilesOnlyFolder,
+} from '../middleware/index.js';
 
 const router = Router();
 
-router.post('/:folderId/upload', validarJWT, checkFolderId, ownerOrAsociated, checkFilesBody, uploadFile);
-router.post('/:folderId/bulk-upload', validarJWT, checkFolderId, ownerOrAsociated, checkFilesBodyBulk, bulkUpload);
+router.post('/:folderId/upload', validarJWT, checkFolderId, ownerOrAsociated, checkFilesBody, checkFilesOnlyFolder, uploadFile);
+router.post('/:folderId/bulk-upload', validarJWT, checkFolderId, ownerOrAsociated, checkFilesBodyBulk, checkFilesOnlyFolder, bulkUpload);
 
 router.delete('/:folderId/:fileId', [ validarJWT, checkFolderId, checkFileId, ownerOrAsociated, fileOwnerOrFolderOwner ], deleteFile);
 

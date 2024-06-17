@@ -14,6 +14,7 @@ import { fileOwnerOrFolderOwner } from './files/check-file-owner-or-folder-owner
 import { checkUsersId } from './users/check-users-id.middleware.js'
 import { checkUpdateBody } from './folders/validate-update-body.middleware.js'
 import { checkParentFolder } from './folders/check-parent-folder.middleware.js'
+import { checkFilesOnlyFolder } from './files/check-files-only-folder.middleware.js'
 
 export { 
   validarJWT, 
@@ -32,4 +33,5 @@ export {
   checkUsersId,
   checkUpdateBody,
   checkParentFolder,
+  checkFilesOnlyFolder,
 };

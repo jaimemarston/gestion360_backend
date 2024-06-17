@@ -1,4 +1,15 @@
 import { FoldersUsers } from '../../models/index.js'
+import { getFolderWithParents } from '../../utils/index.js';
+
+async function getRootFolder(folder) {
+
+  if (folder.parent === null) {
+    return folder;
+  }
+  const folderWithParents = await getFolderWithParents(folder.id);
+  const rootFolder = folderWithParents.dataValues.parents.filter(parent => parent.dataValues.parent === null);
+  return rootFolder[0]
+}
 
 const ownerOrAsociated = async (req, res, next) => {
 
@@ -6,8 +17,9 @@ const ownerOrAsociated = async (req, res, next) => {
   const userIsOwner = req.folder.usuarioId === req.usuario.id
 
   // Check if user is asociated to the folder
-  const userAsociatedToFolder = await FoldersUsers.findOne({ where: { usuarioId: req.usuario.id, FolderId: req.folder.id } })
-
+  const rootFolder = await getRootFolder(req.folder);
+  const userAsociatedToFolder = await FoldersUsers.findOne({ where: { usuarioId: req.usuario.id, FolderId: rootFolder.dataValues.id } })
+  
   if (userIsOwner || userAsociatedToFolder) { 
     next();
   }else {
