@@ -22,7 +22,13 @@ const formatObject = (object) => {
     tags: object.tags,
     uuid: object.uuid,
     usuarioId: object.usuarioId,
-    FolderId: object.FolderId
+    FolderId: object.FolderId,
+    area: object.area,
+    project: object.project,
+    financial: object.financial,
+    date: object.date,
+    currency: object.currency,
+    file_related: object.file_related,
   }
 }
 
@@ -53,7 +59,13 @@ const uploadFile = async (req, res) => {
       tags: req.body.tags ? req.body.tags : [],
       uuid,
       usuarioId: req.usuario.id,
-      FolderId: req.folder.id
+      FolderId: req.folder.id,
+      area: req.body.area,
+      project: req.body.project,
+      financial: req.body.financial,
+      date: req.body.date,
+      currency: req.body.currency,
+      file_related: req.body.file_related,
     })
 
     return res.send({ message: 'Archivo Subido', file: formatObject(file) })

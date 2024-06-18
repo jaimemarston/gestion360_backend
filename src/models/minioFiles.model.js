@@ -23,6 +23,30 @@ export const MinioFiles = sequelize.define('minioFiles', {
   tags: {
     type: DataTypes.JSON,
   },
+  area: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  project: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  financial: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  date: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  currency: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  file_related: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 },
 {
   hooks: {
