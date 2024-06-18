@@ -133,7 +133,18 @@ const getFileUrl = async (req, res) => {
 
 const getFilesByFolder = async (req, res) => {
 
-  const files = await MinioFiles.findAll({ where: { FolderId: req.folder.id } });
+  const page = parseInt(req.query.page) || 1;
+  const pageSize = parseInt(req.query.per_page) || 10;
+  const offset = (page - 1) * pageSize;
+
+  const totalRecords = await MinioFiles.count({ where: { FolderId: req.folder.id } });
+  const totalPages = Math.ceil(totalRecords / pageSize);
+
+  const files = await MinioFiles.findAll({
+    where: { FolderId: req.folder.id },
+    limit: pageSize,
+    offset: offset
+  });
 
   const promises = files.map(async (file) => {
     const filename = `${req.folder.id}/${file.filename}`;
@@ -160,7 +171,15 @@ const getFilesByFolder = async (req, res) => {
 
   });
 
-  return res.send({data: formatted})
+  const response = {
+    data: formatted,
+    totalPages,
+    totalRecords,
+    page: page,
+    per_page: pageSize
+  }
+
+  return res.send({data: response})
 }
 
 
