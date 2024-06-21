@@ -5,6 +5,7 @@ import {
   getFilesByFolder,
   deleteFile,
   getFileUrl,
+  addFileMetadata,
 } from '../controllers/filesManagement.controller.js';
 import { 
   validarJWT,
@@ -21,6 +22,7 @@ const router = Router();
 
 router.post('/:folderId/upload', validarJWT, checkFolderId, ownerOrAsociated, checkFilesBody, checkFilesOnlyFolder, uploadFile);
 router.post('/:folderId/bulk-upload', validarJWT, checkFolderId, ownerOrAsociated, checkFilesBodyBulk, checkFilesOnlyFolder, bulkUpload);
+router.post('/metadata/:fileId', validarJWT, checkFileId, addFileMetadata);
 
 router.delete('/:folderId/:fileId', [ validarJWT, checkFolderId, checkFileId, ownerOrAsociated, fileOwnerOrFolderOwner ], deleteFile);
 

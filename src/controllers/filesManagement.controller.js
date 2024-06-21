@@ -6,29 +6,21 @@ const fileService = new MinioService();
 const FOLDER = 'files';
 
 const formatObject = (object) => {
-
-  if (object.error) {
-    console.log('testrubg');
-    return {
-      filename: object.filename,
-      error: object.error
-    }
-  }
-
   return {
     id: object.id,
     filename: object.filename,
     mimetype: object.mimetype,
-    tags: object.tags,
     uuid: object.uuid,
     usuarioId: object.usuarioId,
     FolderId: object.FolderId,
-    area: object.area,
-    project: object.project,
-    financial: object.financial,
-    date: object.date,
-    currency: object.currency,
-    file_related: object.file_related,
+    metadata: {
+      area: object.area,
+      project: object.project,
+      financial: object.financial,
+      date: object.date,
+      currency: object.currency,
+      file_related: object.file_related,
+    }
   }
 }
 
@@ -56,16 +48,9 @@ const uploadFile = async (req, res) => {
     const file = await MinioFiles.create({
       filename: req.body.filename,
       mimetype: req.body.mimetype,
-      tags: req.body.tags ? req.body.tags : [],
       uuid,
       usuarioId: req.usuario.id,
       FolderId: req.folder.id,
-      area: req.body.area,
-      project: req.body.project,
-      financial: req.body.financial,
-      date: req.body.date,
-      currency: req.body.currency,
-      file_related: req.body.file_related,
     })
 
     return res.send({ message: 'Archivo Subido', file: formatObject(file) })
@@ -104,7 +89,6 @@ const bulkUpload = async (req, res) => {
       const file = await MinioFiles.create({
         filename: object.filename,
         mimetype: object.mimetype,
-        tags: object.tags ? object.tags : [],
         uuid,
         usuarioId: req.usuario.id,
         FolderId: req.folder.id
@@ -164,27 +148,14 @@ const getFilesByFolder = async (req, res) => {
 
     return {
       url,
-      ...file
+      ...formatObject(file)
     }
   });
 
   const result = await Promise.all(promises);
-  const formatted = result.map((object) => {
-
-    return {
-      id: object.dataValues.id,
-      filename: object.dataValues.filename,
-      mimetype: object.dataValues.mimetype,
-      tags: object.dataValues.tags,
-      url: object.url,
-      createdAt: object.dataValues.createdAt,
-      updatedAt: object.dataValues.updatedAt,
-    }
-
-  });
 
   const response = {
-    data: formatted,
+    data: result,
     totalPages,
     totalRecords,
     page: page,
@@ -207,17 +178,21 @@ const deleteFile = async (req, res) => {
 
 }
 
+const addFileMetadata = async (req, res) => {
 
-// const getFileBytes = (filePath) => {
-//   try {
-//     // leer el archivo y devolver su contenido
-//     const fileContent = fs.readFileSync(filePath);
-//     return fileContent;
-//   } catch (err) {
-//     console.error(`Error al leer el archivo: ${err}`);
-//     return null;
-//   }
-// }
+  const data = {
+    area: req.body.area?.trim() || null,
+    project: req.body.project?.trim() || null,
+    financial: req.body.financial?.trim() || null,
+    date: req.body.date?.trim() || null,
+    currency: req.body.currency?.trim() || null,
+    file_related: req.body.file_related?.trim() || null,
+  }
+
+  const file = await req.file.update(data);
+  return res.send({ message: 'Metadata actualizada', file: formatObject(file) })
+
+}
 
 export {
   uploadFile,
@@ -225,5 +200,6 @@ export {
   getFileUrl,
   getFilesUrl,
   getFilesByFolder,
-  deleteFile
+  deleteFile,
+  addFileMetadata
 }
