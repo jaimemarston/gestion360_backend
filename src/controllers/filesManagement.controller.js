@@ -14,6 +14,7 @@ const formatObject = (object) => {
     usuarioId: object.usuarioId,
     FolderId: object.FolderId,
     metadata: {
+      title: object.title,
       area: object.area,
       project: object.project,
       financial: object.financial,
@@ -189,6 +190,7 @@ const deleteFile = async (req, res) => {
 const addFileMetadata = async (req, res) => {
 
   const data = {
+    title: req.body.title?.trim() || null,
     area: req.body.area?.trim() || null,
     project: req.body.project?.trim() || null,
     financial: req.body.financial?.trim() || null,
