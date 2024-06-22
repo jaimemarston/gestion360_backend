@@ -20,7 +20,7 @@ const formatObject = (object) => {
       date: object.date,
       currency: object.currency,
       file_related: object.file_related,
-      tags: object.fileTags.map(tag => ({name: tag.name, id: tag.id}))
+      tags: object.fileTags?.map(tag => ({name: tag.name, id: tag.id})) || null
     }
   }
 }
