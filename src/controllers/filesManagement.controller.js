@@ -20,6 +20,7 @@ const formatObject = (object) => {
       date: object.date,
       currency: object.currency,
       file_related: object.file_related,
+      tags: object.fileTags.map(tag => ({name: tag.name, id: tag.id}))
     }
   }
 }
@@ -138,9 +139,16 @@ const getFilesByFolder = async (req, res) => {
 
   const files = await MinioFiles.findAll({
     where: { FolderId: req.folder.id },
+    include: [
+        {
+            model: Tag,
+            as: 'fileTags',
+        },
+    ],
     limit: pageSize,
     offset: offset
   });
+
 
   const promises = files.map(async (file) => {
     const filename = `${req.folder.id}/${file.filename}`;
@@ -203,8 +211,8 @@ const addFileMetadata = async (req, res) => {
 
     await Promise.all(promises);
   }
-
-  return res.send({ message: 'Metadata actualizada', file: {...formatObject(file), tags: fileTags} })
+  
+  return res.send({ message: 'Metadata actualizada', file: {...formatObject({...file.toJSON(), fileTags})} })
 }
 
 async function findOrCreateTag(rawName) {
