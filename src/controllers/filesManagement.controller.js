@@ -1,6 +1,6 @@
 import  MinioService from '../minio/minio.service.js';
 import { v4 as uuidv4 } from 'uuid';
-import {  MinioFiles } from '../models/index.js';
+import { MinioFiles, Tag, TagFile } from '../models/index.js';
 const fileService = new MinioService();
 
 const FOLDER = 'files';
@@ -190,8 +190,47 @@ const addFileMetadata = async (req, res) => {
   }
 
   const file = await req.file.update(data);
-  return res.send({ message: 'Metadata actualizada', file: formatObject(file) })
+  const fileTags = []
 
+  if (req.body.tags && req.body.tags.length > 0){
+    const promises = req.body.tags.map(async (tag) => {
+
+      const tagObject = await findOrCreateTag(tag);
+      await addTagToFile(file.toJSON(), tagObject);
+      fileTags.push(tagObject);
+
+    });
+
+    await Promise.all(promises);
+  }
+
+  return res.send({ message: 'Metadata actualizada', file: {...formatObject(file), tags: fileTags} })
+}
+
+async function findOrCreateTag(rawName) {
+  const name = rawName.trim().toLowerCase().trim().replace(/\s/g, '-');
+  const [tag, created] = await Tag.findOrCreate({
+    where: {name},
+    defaults: {name},
+  });
+  return tag.toJSON()
+}
+
+async function addTagToFile(file, tag) {
+  const tagAlreadyAdded = await TagFile.findOne({
+    where: {
+      fileId: file.id,
+      tagId: tag.id
+    }
+  });
+
+  if (!tagAlreadyAdded) {
+    await TagFile.create({
+      fileId: file.id,
+      minioFileId: file.id,
+      tagId: tag.id
+    });
+  }
 }
 
 export {

@@ -23,6 +23,9 @@ import { Folders } from './folders.model.js';
 import { FoldersUsers } from './folders-users.model.js';
 import { MinioFiles } from './minioFiles.model.js';
 
+import { Tag } from './tag.model.js';
+import { TagFile } from './tag-file.model.js';
+
 RegistroProyecto.hasMany(Solicitud,  { onDelete: 'RESTRICT' }); 
 Solicitud.belongsTo(RegistroProyecto);
 
@@ -41,6 +44,12 @@ MinioFiles.belongsTo(Usuario);
 
 Usuario.belongsToMany(Folders, { through: FoldersUsers });
 Folders.belongsToMany(Usuario, { through: FoldersUsers });
+
+Tag.belongsToMany(MinioFiles, { through: TagFile, as: 'files' });
+MinioFiles.belongsToMany(Tag, { through: TagFile, as: 'fileTags' });
+
+export { Tag } from './tag.model.js';
+export { TagFile } from './tag-file.model.js';
 
 export { FoldersUsers } from './folders-users.model.js';
 export { Folders } from './folders.model.js';
