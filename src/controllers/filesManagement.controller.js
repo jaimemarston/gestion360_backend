@@ -203,6 +203,10 @@ const addFileMetadata = async (req, res) => {
   const fileTags = []
 
   if (req.body.tags && req.body.tags.length > 0){
+
+    // Delete all tags from file and add new ones
+    await TagFile.destroy({where: {fileId: file.id}});
+
     const promises = req.body.tags.map(async (tag) => {
 
       const tagObject = await findOrCreateTag(tag);
