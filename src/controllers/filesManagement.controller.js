@@ -205,7 +205,7 @@ const addFileMetadata = async (req, res) => {
   if (req.body.tags && req.body.tags.length > 0){
 
     // Delete all tags from file and add new ones
-    await TagFile.destroy({where: {fileId: file.id}});
+    await TagFile.destroy({where: {minioFileId: file.id}});
 
     const promises = req.body.tags.map(async (tag) => {
 
@@ -233,14 +233,13 @@ async function findOrCreateTag(rawName) {
 async function addTagToFile(file, tag) {
   const tagAlreadyAdded = await TagFile.findOne({
     where: {
-      fileId: file.id,
+      minioFileId: file.id,
       tagId: tag.id
     }
   });
 
   if (!tagAlreadyAdded) {
     await TagFile.create({
-      fileId: file.id,
       minioFileId: file.id,
       tagId: tag.id
     });
