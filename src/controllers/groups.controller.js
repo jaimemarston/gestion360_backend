@@ -1,6 +1,7 @@
 import { Folders, Groups, MinioFiles, FoldersUsers } from '../models/index.js'
 import { USER_ROLE } from '../utils/enums/user-role.enum.js'
 import { v4 as uuidv4 } from 'uuid';
+import { sequelize as Sequelize } from '../database/db.js';
 
 function formatObject(group) {
   return {
@@ -51,10 +52,16 @@ const getOne = async (req, res) => {
 
 const getAll = async (req, res) => {
 
+    const yearFilterParam = req.query.year || null;
+    const yearCondition = yearFilterParam 
+    ? Sequelize.where(Sequelize.fn('EXTRACT', Sequelize.literal(`YEAR FROM "Group"."createdAt"`)), yearFilterParam)
+    : {};
+
     let allFolders = await Folders.findAll({
         include: [{
             model: Groups,
-            as: 'Group'
+            as: 'Group',
+            where: yearCondition
         }]
     });
 
@@ -109,7 +116,12 @@ const getAll = async (req, res) => {
 
     // If admin show all groups, even when they don't have folders
     if (req.usuario.dataValues.rol === USER_ROLE.ADMIN) {
-      const allGroups = await Groups.findAll();
+
+      const yearConditionGroups = yearFilterParam 
+      ? Sequelize.where(Sequelize.fn('EXTRACT', Sequelize.literal(`YEAR FROM "createdAt"`)), yearFilterParam)
+      : {};
+
+      const allGroups = await Groups.findAll({ where: yearConditionGroups });
 
       const newGroups = allGroups.filter(allGroup => 
         !result.some(group => group.id === allGroup.id)
