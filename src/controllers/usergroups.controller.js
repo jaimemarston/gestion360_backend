@@ -1,5 +1,5 @@
 import { UserGroup } from '../models/user-group.model.js';
-import {  Sequelize } from "sequelize";
+import { Sequelize } from "sequelize";
 
 const parser = (group) => {
   return {
@@ -8,8 +8,15 @@ const parser = (group) => {
   }
 }
 
+const getOne = async (req, res) => {
+  const group = parser(req.usergroup)
+  return res.status(200).send({data: group});
+}
+
 const getAll = async (req, res) => {
-  return res.send('getAll')
+  const groups = await UserGroup.findAll();
+  const parsedGroups = groups.map(parser);
+  return res.status(200).send({data: parsedGroups});
 }
 
 const create = async (req, res) => {
@@ -48,5 +55,6 @@ const update = async (req, res) => {
 export {
   getAll,
   create,
-  update
+  update,
+  getOne
 }
