@@ -15,6 +15,7 @@ import { checkUsersId } from './users/check-users-id.middleware.js'
 import { checkUpdateBody } from './folders/validate-update-body.middleware.js'
 import { checkParentFolder } from './folders/check-parent-folder.middleware.js'
 import { checkFilesOnlyFolder } from './files/check-files-only-folder.middleware.js'
+import { checkUsergrupId } from './usergroups/check-usergroup-id.middleware.js'
 
 export { 
   validarJWT, 
@@ -34,4 +35,5 @@ export {
   checkUpdateBody,
   checkParentFolder,
   checkFilesOnlyFolder,
+  checkUsergrupId,
 };
