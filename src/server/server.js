@@ -22,7 +22,8 @@ import {
   registroPresupuesto,
   minioRoutes,
   groupsRoutes,
-  foldersRoute
+  foldersRoute,
+  usergroupsRoute
 } from '../routes/index.js';
 
 class Server {
@@ -88,6 +89,7 @@ this.app.use(this.prefix, registroPresupuesto);
 this.app.use(`${this.prefix}/minio`, minioRoutes)
 this.app.use(`${this.prefix}/groups`, groupsRoutes)
 this.app.use(`${this.prefix}/folders`, foldersRoute)
+this.app.use(`${this.prefix}/usergroups`, usergroupsRoute)
 
   }
   listen() {

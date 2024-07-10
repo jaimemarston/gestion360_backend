@@ -27,6 +27,7 @@ import registroTipoDocumento from "./registroTipoDocumento.routes.js";
 import user from "./user.routes.js";
 import groupsRoutes from "./groups.routes.js";
 import foldersRoute from "./folders.routes.js";
+import usergroupsRoute from "./usergroups.js";
 
 export {
   solicitudRoutes,
@@ -47,5 +48,6 @@ export {
   registroPresupuesto,
   minioRoutes,
   groupsRoutes,
-  foldersRoute
+  foldersRoute,
+  usergroupsRoute
 };
