@@ -22,6 +22,9 @@ import { Usuario } from './user.model.js';
 import { Folders } from './folders.model.js';
 import { FoldersUsers } from './folders-users.model.js';
 import { MinioFiles } from './minioFiles.model.js';
+import { UserGroup } from './user-group.model.js';
+import { User_Group } from './user-group-user.model.js';
+import { Usergroup_Folder } from './user-group-folder.model.js';
 
 import { Tag } from './tag.model.js';
 import { TagFile } from './tag-file.model.js';
@@ -48,6 +51,13 @@ Folders.belongsToMany(Usuario, { through: FoldersUsers });
 Tag.belongsToMany(MinioFiles, { through: TagFile, as: 'files' });
 MinioFiles.belongsToMany(Tag, { through: TagFile, as: 'fileTags' });
 
+UserGroup.belongsToMany(Usuario, { through: User_Group, as: 'users' });
+Usuario.belongsToMany(Groups, { through: User_Group, as: 'groups' });
+
+UserGroup.belongsToMany(Folders, { through: Usergroup_Folder, as: 'folders' });
+Folders.belongsToMany(UserGroup, { through: Usergroup_Folder, as: 'usergroups' });
+
+export { UserGroup } from './user-group.model.js';
 export { Tag } from './tag.model.js';
 export { TagFile } from './tag-file.model.js';
 
