@@ -3,7 +3,7 @@ import { sequelize } from '../database/db.js';
 import { UserGroup, Usuario } from './index.js';
 
 export const User_Group = sequelize.define('user_group', {
-  GroupId: {
+  usergroupId: {
     type: DataTypes.INTEGER,
     unique: false,
     references: {

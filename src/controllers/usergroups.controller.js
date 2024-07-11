@@ -1,4 +1,4 @@
-import { UserGroup } from '../models/user-group.model.js';
+import { UserGroup, Usuario } from '../models/index.js';
 import { Sequelize } from "sequelize";
 
 const parser = (group) => {
@@ -52,9 +52,39 @@ const update = async (req, res) => {
   return res.status(200).send({ message: 'Se ha actualizado correctamente', usergroup: parser(group) })
 }
 
+const addUsers = async (req, res) => {
+
+  const { users: usersIds } = req.body;
+
+  if (!usersIds || !Array.isArray(usersIds) || usersIds.length === 0) {
+    return res.status(400).send({ message: 'Debe enviar un arreglo de usuarios' })
+  }
+
+  const users = await Usuario.findAll({ where: { id: { [Sequelize.Op.in]: usersIds } } });
+  await req.usergroup.addUsers(users);
+
+  return res.send({ message: 'Se han agregado los usuarios con éxito' })
+}
+
+const removeUsers = async (req, res) => {
+
+  const { users: usersIds } = req.body;
+
+  if (!usersIds || !Array.isArray(usersIds) || usersIds.length === 0) {
+    return res.status(400).send({ message: 'Debe enviar un arreglo de usuarios' })
+  }
+
+  const users = await Usuario.findAll({ where: { id: { [Sequelize.Op.in]: usersIds } } });
+  await req.usergroup.removeUsers(users);
+
+  return res.send({ message: 'Se han eliminado los usuarios del grupo éxito' })
+}
+
 export {
   getAll,
   create,
   update,
-  getOne
+  getOne,
+  addUsers,
+  removeUsers
 }

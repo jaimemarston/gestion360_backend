@@ -52,7 +52,7 @@ Tag.belongsToMany(MinioFiles, { through: TagFile, as: 'files' });
 MinioFiles.belongsToMany(Tag, { through: TagFile, as: 'fileTags' });
 
 UserGroup.belongsToMany(Usuario, { through: User_Group, as: 'users' });
-Usuario.belongsToMany(Groups, { through: User_Group, as: 'groups' });
+Usuario.belongsToMany(UserGroup, { through: User_Group, as: 'groups' });
 
 UserGroup.belongsToMany(Folders, { through: Usergroup_Folder, as: 'folders' });
 Folders.belongsToMany(UserGroup, { through: Usergroup_Folder, as: 'usergroups' });

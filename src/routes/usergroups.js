@@ -3,7 +3,9 @@ import {
   getAll,
   create,
   update,
-  getOne
+  getOne,
+  addUsers,
+  removeUsers
 } from '../controllers/usergroups.controller.js';
 import {
   validarJWT,
@@ -12,9 +14,12 @@ import {
 } from '../middleware/index.js';
 const router = Router();
 
-router.get('/:usergroupId', validarJWT, checkUsergrupId, haveRol('ADMIN_ROLE'), getOne);
-router.get('/', validarJWT, haveRol('ADMIN_ROLE'), getAll);
+router.get('/:usergroupId', validarJWT, checkUsergrupId, getOne);
+router.get('/', validarJWT, getAll);
 router.post('/', validarJWT, haveRol('ADMIN_ROLE'), create);
 router.patch('/:usergroupId',  validarJWT, checkUsergrupId, haveRol('ADMIN_ROLE'), update);
+
+router.post('/:usergroupId/addUsers', validarJWT, haveRol('ADMIN_ROLE'), checkUsergrupId, addUsers);
+router.post('/:usergroupId/removeUsers', validarJWT, haveRol('ADMIN_ROLE'), checkUsergrupId, removeUsers);
 
 export default router;
