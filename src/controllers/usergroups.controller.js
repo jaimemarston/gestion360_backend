@@ -1,21 +1,22 @@
 import { UserGroup, Usuario } from '../models/index.js';
 import { Sequelize } from "sequelize";
 
-const parser = (group) => {
+const parser = async (group) => {
   return {
     id: group.id,
-    name: group.name
+    name: group.name,
+    usersAmount: await group.countUsers()
   }
 }
 
 const getOne = async (req, res) => {
-  const group = parser(req.usergroup)
+  const group = await parser(req.usergroup)
   return res.status(200).send({data: group});
 }
 
 const getAll = async (req, res) => {
   const groups = await UserGroup.findAll();
-  const parsedGroups = groups.map(parser);
+  const parsedGroups = await Promise.all(groups.map(parser));
   return res.status(200).send({data: parsedGroups});
 }
 
@@ -32,7 +33,7 @@ const create = async (req, res) => {
   }
 
   const group = await UserGroup.create({ name });
-  return res.status(201).send({ message: 'Se ha creado con éxito', usergroup: parser(group) })
+  return res.status(201).send({ message: 'Se ha creado con éxito', usergroup: await parser(group) });
 }
 
 const update = async (req, res) => {
@@ -49,7 +50,7 @@ const update = async (req, res) => {
 
   await UserGroup.update( { name }, { where: { id: req.usergroup.id } });
   const group = await UserGroup.findByPk(req.usergroup.id);
-  return res.status(200).send({ message: 'Se ha actualizado correctamente', usergroup: parser(group) })
+  return res.status(200).send({ message: 'Se ha actualizado correctamente', usergroup: await parser(group) })
 }
 
 const addUsers = async (req, res) => {
