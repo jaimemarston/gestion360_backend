@@ -130,7 +130,6 @@ const addUserToFolder = async (req, res) => {
     req.folder.addUsergroups(groups);
   }
 
-
   return res.status(200).send({ message: 'Usuarios agregado a la carpeta' });
 }
 

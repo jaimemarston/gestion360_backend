@@ -1,4 +1,4 @@
-import { Folders, Groups, MinioFiles, FoldersUsers } from '../models/index.js'
+import { Folders, Groups, MinioFiles, FoldersUsers, Usuario, UserGroup } from '../models/index.js'
 import { USER_ROLE } from '../utils/enums/user-role.enum.js'
 import { v4 as uuidv4 } from 'uuid';
 import { sequelize as Sequelize } from '../database/db.js';
@@ -83,12 +83,27 @@ const getAll = async (req, res) => {
 
     // If not admin filter folders by user
     if (req.usuario.dataValues.rol !== USER_ROLE.ADMIN) {
-      const folders = await Folders.findAll({ where: { usuarioId: req.usuario.id }});
-      const asociated = await FoldersUsers.findAll({ where: { usuarioId: req.usuario.id } });
 
-      const folderIds = [...new Set([...folders.map(folder => folder.dataValues.id), ...asociated.map(folder => folder.dataValues.FolderId)])];
+    console.log(req.usuario.dataValues.id)
+    const usuario = await Usuario.findByPk(req.usuario.dataValues.id);
+    console.log(usuario)
+    let grupos = await usuario.getGroups();
 
-      filteredFolders = formattedFolders.filter(folder => folderIds.includes(folder.id))
+    console.log({grupos})
+    
+    const usergroup = await UserGroup.findByPk(1);
+    const users = await usergroup.getUsers();
+    console.log(users)
+
+      let carpetasDirectas = await req.usuario.getFolders();
+
+      let carpetasDeGrupos = [];
+      for(let grupo of grupos) {
+        let carpetas = await grupo.getFolders();
+        carpetasDeGrupos.push(...carpetas);
+      }
+
+      filteredFolders = [...carpetasDirectas, ...carpetasDeGrupos];
     } 
 
     const groups = Array.from(
