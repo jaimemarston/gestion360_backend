@@ -1,4 +1,4 @@
-import { Folders, FoldersUsers, Usuario } from '../models/index.js'
+import { Folders, FoldersUsers, Usuario, UserGroup } from '../models/index.js'
 import { v4 as uuidv4 } from 'uuid';
 import {  Sequelize } from "sequelize";
 // import { FoldersUsers } from '../models/index.js'
@@ -117,20 +117,19 @@ const addUserToFolder = async (req, res) => {
   if (req.folder.parent !== null) {
     return res.status(400).send({ message: 'Solo las carpetas raiz pueden recibir usuarios' });
   }
+
+  const { usergroups_ids, user_ids } = req.body;
    
-  const promises = req.usuarios.map( async user => {
-    const data = {
-      usuarioId: user.id,
-      FolderId: req.folder.id
-    };
+  if (user_ids && Array.isArray(user_ids) && user_ids.length > 0) {
+    const users = await Usuario.findAll({ where: { id: { [Sequelize.Op.in]: user_ids } } });
+    req.folder.addUsers(users);
+  }
+  
+  if (usergroups_ids && Array.isArray(usergroups_ids) && usergroups_ids.length > 0) {
+    const groups = await UserGroup.findAll({ where: { id: { [Sequelize.Op.in]: usergroups_ids } } });
+    req.folder.addUsergroups(groups);
+  }
 
-    const alreadyAdded = await FoldersUsers.findOne({ where: data });
-    if (!alreadyAdded) {
-      await FoldersUsers.create(data);
-    }
-  });
-
-  await Promise.all(promises);
 
   return res.status(200).send({ message: 'Usuarios agregado a la carpeta' });
 }
@@ -141,16 +140,17 @@ const removeUserToFolder = async (req, res) => {
     return res.status(400).send({ message: 'Solo las carpetas raiz pueden recibir usuarios' });
   }
 
-  const promises = req.usuarios.map( async user => {
-    const data = {
-      usuarioId: user.id,
-      FolderId: req.folder.id
-    };
-
-    await FoldersUsers.destroy({ where: data });
-  });
-
-  await Promise.all(promises);
+  const { usergroups_ids, user_ids } = req.body;
+   
+  if (user_ids && Array.isArray(user_ids) && user_ids.length > 0) {
+    const users = await Usuario.findAll({ where: { id: { [Sequelize.Op.in]: user_ids } } });
+    req.folder.removeUsers(users);
+  }
+  
+  if (usergroups_ids && Array.isArray(usergroups_ids) && usergroups_ids.length > 0) {
+    const groups = await UserGroup.findAll({ where: { id: { [Sequelize.Op.in]: usergroups_ids } } });
+    req.folder.removeUsergroups(groups);
+  }
 
   return res.status(200).send({ message: 'Usuarios eliminados de la carpeta correctamente' });
 }

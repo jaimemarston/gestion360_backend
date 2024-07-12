@@ -45,8 +45,8 @@ Folders.hasMany(MinioFiles, { as: 'documents' });
 MinioFiles.belongsTo(Folders);
 MinioFiles.belongsTo(Usuario);
 
-Usuario.belongsToMany(Folders, { through: FoldersUsers });
-Folders.belongsToMany(Usuario, { through: FoldersUsers });
+Usuario.belongsToMany(Folders, { through: FoldersUsers, as: 'folders' });
+Folders.belongsToMany(Usuario, { through: FoldersUsers, as: 'users' });
 
 Tag.belongsToMany(MinioFiles, { through: TagFile, as: 'files' });
 MinioFiles.belongsToMany(Tag, { through: TagFile, as: 'fileTags' });
