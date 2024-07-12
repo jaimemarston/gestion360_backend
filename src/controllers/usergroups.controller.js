@@ -22,6 +22,7 @@ const getAll = async (req, res) => {
 
 const create = async (req, res) => {
   const { name } = req.body;
+  const { usersIds } = req.body;
 
   if(! name ) {
     return res.status(400).send({ message: 'El nombre del grupo es requerido' })
@@ -33,6 +34,12 @@ const create = async (req, res) => {
   }
 
   const group = await UserGroup.create({ name });
+
+  if (usersIds && Array.isArray(usersIds) && usersIds.length > 0) {
+    const users = await Usuario.findAll({ where: { id: { [Sequelize.Op.in]: usersIds } } });
+    await group.addUsers(users);
+  }
+
   return res.status(201).send({ message: 'Se ha creado con éxito', usergroup: await parser(group) });
 }
 
