@@ -29,7 +29,7 @@ router.post('/', validarJWT, checkBody, checkGroupId, checkParentFolder, haveRol
 router.patch('/:folderId',  validarJWT, checkFolderId, checkUpdateBody, haveRol('ADMIN_ROLE'), update);
 router.delete('/:folderId', validarJWT, checkFolderId, remove);
 
-router.post('/add-user/:folderId', validarJWT, checkFolderId, checkUsersId, haveRol('ADMIN_ROLE'), addUserToFolder);
-router.delete('/remove-user/:folderId', validarJWT, checkFolderId, checkUsersId, haveRol('ADMIN_ROLE'), removeUserToFolder);
+router.post('/add-user/:folderId', validarJWT, checkFolderId,  haveRol('ADMIN_ROLE'), addUserToFolder);
+router.delete('/remove-user/:folderId', validarJWT, checkFolderId,  haveRol('ADMIN_ROLE'), removeUserToFolder);
 
 export default router;
