@@ -1,16 +1,39 @@
+import { Sequelize } from "sequelize";
 import { request, response } from 'express';
-import { Usuario, registroEmpleado } from '../models/index.js';
+import { Usuario, registroEmpleado, User_Group, FoldersUsers } from '../models/index.js';
 import bcryptjs from 'bcryptjs';
 import { validateUserSchema } from '../helpers/schemaUser.js';
 
 const userAll = async (req = request, res = response) => {
+
+  const { folderId, usergroupId } = req.query;
+
+  if (folderId && usergroupId) {
+    return res.status(400).send({ message: "Solo puedes enviar un parametro a la vez"});
+  }
+
+  let alreadyIncludedIds = [];
+  if (folderId) {
+    const folder = await FoldersUsers.findAll({ where: { FolderId: folderId } });
+    alreadyIncludedIds = folder.map(f => f.usuarioId);
+  }
+
+  if (usergroupId) {
+    const usergroups = await User_Group.findAll({ where: { usergroupId } });
+    alreadyIncludedIds = usergroups.map(u => u.usuarioId);
+  }
+
   const [usuario, count] = await Promise.all([
     Usuario.findAll({
       order: ['id'],
+      where: { id: { [Sequelize.Op.notIn]: alreadyIncludedIds } },
     }),
     Usuario.count(),
   ]);
-  res.status(200).json({ message: 'Lista de usuarios', usuario, count });
+
+  const alreadyIncludedUsers = await Usuario.findAll({ where: { id: { [Sequelize.Op.in]: alreadyIncludedIds } } });
+
+  res.status(200).json({ message: 'Lista de usuarios', usuario, alreadyIncluded: alreadyIncludedUsers, count });
 };
 
 
@@ -43,14 +66,10 @@ const salt = bcryptjs.genSaltSync();
   
   try {
 
-    const dataUser =   users.map((element) => {
-
+    const dataUser = users.map((element) => {
       element.password = bcryptjs.hashSync(element.password, salt);
-
-    return element
-      
+      return element
     })
-    
    
     const usuarios = await Usuario.bulkCreate(dataUser, {
       ignoreDuplicates: true

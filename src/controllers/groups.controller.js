@@ -84,8 +84,8 @@ const getAll = async (req, res) => {
     // If not admin filter folders by user
     if (req.usuario.dataValues.rol !== USER_ROLE.ADMIN) {
 
-    const usuario = await Usuario.findByPk(req.usuario.dataValues.id);
-    let grupos = await usuario.getUsergroup();
+      const usuario = await Usuario.findByPk(req.usuario.dataValues.id);
+      let grupos = await usuario.getUsergroup();
 
       let carpetasDirectas = await req.usuario.getFolders();
 

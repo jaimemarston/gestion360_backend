@@ -57,6 +57,7 @@ Usuario.belongsToMany(UserGroup, { through: User_Group, as: 'usergroup' });
 UserGroup.belongsToMany(Folders, { through: Usergroup_Folder, as: 'folders' });
 Folders.belongsToMany(UserGroup, { through: Usergroup_Folder, as: 'usergroups' });
 
+export { User_Group } from './user-group-user.model.js';
 export { UserGroup } from './user-group.model.js';
 export { Tag } from './tag.model.js';
 export { TagFile } from './tag-file.model.js';
