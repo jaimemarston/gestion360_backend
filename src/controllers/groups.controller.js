@@ -95,10 +95,11 @@ const getAll = async (req, res) => {
         carpetasDeGrupos.push(...carpetas);
       }
 
-      filteredFolders = [...carpetasDirectas, ...carpetasDeGrupos];
+      const folderIds = [...new Set([...carpetasDirectas.map(folder => folder.dataValues.id), ...carpetasDeGrupos.map(folder => folder.dataValues.id)])];
+
+      filteredFolders = formattedFolders.filter(folder => folderIds.includes(folder.id))
     } 
 
-  console.log({filteredFolders: filteredFolders.map(folder => folder.toJSON())})
     const groups = Array.from(
       filteredFolders
         .map(rootFolder => formatObject(rootFolder.group) )
