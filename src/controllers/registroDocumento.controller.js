@@ -12,6 +12,8 @@ import {  Op, Sequelize } from "sequelize";
 import path from "path";
 import archiver from 'archiver';
 
+import { checkFolderStructureCreated } from '../helpers/uploadSignedBoletaToFileManager.js';
+
 const fileService = new MinioService();
 const FOLDER_FIRMAS = 'firmas';
 const FOLDER_DOCUMENTS = 'documents';
@@ -446,7 +448,6 @@ const regDoc = await RegistroDocumento.bulkCreate(documentosValidos, {
 
 };
 
-
 const firmarDoc = async (req,res,next) => {
   const {user,doc} = req.body
 
@@ -455,16 +456,15 @@ try {
   const pdfBytes = await fileService.getFileBytes(`documents/${doc.nombredoc}`)
   const pdfDoc = await PDFDocument.load(pdfBytes);    // Encuentra las coordenadas donde se colocará la imagen de la firma
   const page = pdfDoc.getPages()[0]; // Obtén la primera página del PDF
-  const { width, height } = page.getSize(); // Obtén el ancho y alto de la página
-/*     const x = width / 2; // Coloca la imagen en el centro de la página
-  const y = height / 2; */
+
+
+  await checkFolderStructureCreated(doc);
+  return res.send('hello world');
 
   // Agrega la imagen como un sello en la página
   const imageBytes = await fileService.getFileBytes(`firmas/${user?.imgfirma}.jpg`)
   const image = await pdfDoc.embedJpg(imageBytes);
   page.drawImage(image, {
-/*       x: x - image.width / 2, // Ajusta la posición de la imagen
-    y: y - image.height / 2, */
     x: 200,
     y: 130,
     width: 45,
