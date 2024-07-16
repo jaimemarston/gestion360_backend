@@ -1,4 +1,5 @@
-import { RegistroDocumento, Usuario, registroEmpleado, Folders, Groups } from '../models/index.js';
+import { Folders, Groups, MinioFiles } from '../models/index.js';
+import { v4 as uuidv4 } from 'uuid';
 import  MinioService from '../minio/minio.service.js';
 const fileService = new MinioService();
 
@@ -50,16 +51,24 @@ const checkFolderStructureCreated = async (doc) => {
   const month = await getMonthNameByBoletaName(doc.nombredoc);
   if (month) {
     let monthFolder = await Folders.findOne({ where: { label: month, GroupId: group.id, parent: subFolder.id } });
+
     monthFolder = monthFolder
     ? monthFolder.toJSON()
     : await Folders.create({ label: month, GroupId: group.id, parent: subFolder.id });
 
-
-    const documentBytes = await fileService.getFileBytes(`documents/${doc.nombredoc}`)
+    const documentBytes = await fileService.getFileBytes(`documents/firmado_${doc.nombredoc}`)
     const documentBase64 = documentBytes.toString('base64');
 
-    const filename = `${monthFolder.id}/${doc.nombredoc}`;
+    const filename = `${monthFolder.id}/firmado_${doc.nombredoc}`;
     await fileService.saveBase64ToMinio(documentBase64, filename, FOLDER);
+
+    await MinioFiles.create({
+      uuid: uuidv4(),
+      filename: `firmado_${doc.nombredoc}`,
+      mimetype: 'application/pdf',
+      FolderId: monthFolder.id,
+    })
+
   }
 
 }

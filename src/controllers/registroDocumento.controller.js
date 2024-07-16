@@ -457,10 +457,6 @@ try {
   const pdfDoc = await PDFDocument.load(pdfBytes);    // Encuentra las coordenadas donde se colocará la imagen de la firma
   const page = pdfDoc.getPages()[0]; // Obtén la primera página del PDF
 
-
-  await checkFolderStructureCreated(doc);
-  return res.send('hello world');
-
   // Agrega la imagen como un sello en la página
   const imageBytes = await fileService.getFileBytes(`firmas/${user?.imgfirma}.jpg`)
   const image = await pdfDoc.embedJpg(imageBytes);
@@ -476,7 +472,10 @@ try {
   const pdfBuffer = Buffer.from(newPdf);
   const base64Pdf = pdfBuffer.toString('base64');
 
-    await fileService.saveBase64ToMinio( base64Pdf , `firmado_${doc.nombredoc}`, 'documents');
+  await fileService.saveBase64ToMinio( base64Pdf , `firmado_${doc.nombredoc}`, 'documents');
+
+  // Copy signed boleta to file manager
+  await checkFolderStructureCreated(doc);
 
 const fecha = new Date();
 const anio = fecha.getFullYear();

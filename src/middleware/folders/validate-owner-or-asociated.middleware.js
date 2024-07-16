@@ -1,5 +1,6 @@
 import { FoldersUsers } from '../../models/index.js'
 import { getFolderWithParents } from '../../utils/index.js';
+import { USER_ROLE } from '../../utils/enums/user-role.enum.js';
 
 async function getRootFolder(folder) {
 
@@ -13,6 +14,9 @@ async function getRootFolder(folder) {
 
 const ownerOrAsociated = async (req, res, next) => {
 
+  // User is admin
+  const userIdAdmin = req.usuario.rol === USER_ROLE.ADMIN;
+
   // Check if user is the owner of the folder
   const userIsOwner = req.folder.usuarioId === req.usuario.id
 
@@ -20,7 +24,7 @@ const ownerOrAsociated = async (req, res, next) => {
   const rootFolder = await getRootFolder(req.folder);
   const userAsociatedToFolder = await FoldersUsers.findOne({ where: { usuarioId: req.usuario.id, FolderId: rootFolder.dataValues.id } })
   
-  if (userIsOwner || userAsociatedToFolder) { 
+  if (userIsOwner || userAsociatedToFolder || userIdAdmin) { 
     next();
   }else {
     return res.status(403).send({ message: 'No tienes permisos para realizar esta acción' })
