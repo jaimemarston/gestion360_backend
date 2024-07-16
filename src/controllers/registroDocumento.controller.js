@@ -461,9 +461,9 @@ try {
   const imageBytes = await fileService.getFileBytes(`firmas/${user?.imgfirma}.jpg`)
   const image = await pdfDoc.embedJpg(imageBytes);
   page.drawImage(image, {
-    x: 200,
+    x: 180,
     y: 130,
-    width: 45,
+    width: 100,
     height: 45,
   });
 
