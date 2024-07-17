@@ -30,6 +30,6 @@ router.patch('/:folderId',  validarJWT, checkFolderId, checkUpdateBody, haveRol(
 router.delete('/:folderId', validarJWT, checkFolderId, remove);
 
 router.post('/add-user/:folderId', validarJWT, checkFolderId,  haveRol('ADMIN_ROLE'), addUserToFolder);
-router.delete('/remove-user/:folderId', validarJWT, checkFolderId,  haveRol('ADMIN_ROLE'), removeUserToFolder);
+router.post('/remove-user/:folderId', validarJWT, checkFolderId,  haveRol('ADMIN_ROLE'), removeUserToFolder);
 
 export default router;
