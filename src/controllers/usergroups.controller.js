@@ -1,4 +1,4 @@
-import { UserGroup, Usuario } from '../models/index.js';
+import { Folders, UserGroup, Usuario } from '../models/index.js';
 import { Sequelize } from "sequelize";
 
 const parser = async (group) => {
@@ -15,9 +15,26 @@ const getOne = async (req, res) => {
 }
 
 const getAll = async (req, res) => {
-  const groups = await UserGroup.findAll();
+
+  let alreadyIncludedUsergroups = [];
+  if ( req.query.folderId && !isNaN(req.query.folderId) ) {
+    const folder = await Folders.findByPk(req.query.folderId);
+    if (!folder) {
+     return res.status(404).send({ message: 'Carpeta no encontrada' })
+    }
+
+    alreadyIncludedUsergroups = await folder.getUsergroups()
+  }
+
+
+  const groups = await UserGroup.findAll({
+    where: { id: { [Sequelize.Op.notIn]: alreadyIncludedUsergroups.map(group => group.id) } }
+  });
   const parsedGroups = await Promise.all(groups.map(parser));
-  return res.status(200).send({data: parsedGroups});
+  const parsedAlreadyIncludedUsergroups = await Promise.all(alreadyIncludedUsergroups.map(parser));
+
+
+  return res.status(200).send({data: {parsedGroups, parsedAlreadyIncludedUsergroups}});
 }
 
 const create = async (req, res) => {
