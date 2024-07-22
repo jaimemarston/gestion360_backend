@@ -33,9 +33,7 @@ const login = async (req, res) => {
 
 
     usuario.password = null
-   
     const user = {id: usuario.id}
-    
     const token = await generateJWT(user);
 
     res.status(200).json({ usuario, token });

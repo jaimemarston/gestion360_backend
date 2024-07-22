@@ -23,7 +23,8 @@ import {
   minioRoutes,
   groupsRoutes,
   foldersRoute,
-  usergroupsRoute
+  usergroupsRoute,
+  googleRoutes,
 } from '../routes/index.js';
 
 class Server {
@@ -90,6 +91,7 @@ this.app.use(`${this.prefix}/minio`, minioRoutes)
 this.app.use(`${this.prefix}/groups`, groupsRoutes)
 this.app.use(`${this.prefix}/folders`, foldersRoute)
 this.app.use(`${this.prefix}/usergroups`, usergroupsRoute)
+this.app.use(`${this.prefix}/google`, googleRoutes)
 
   }
   listen() {

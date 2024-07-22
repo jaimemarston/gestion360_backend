@@ -28,6 +28,7 @@ import user from "./user.routes.js";
 import groupsRoutes from "./groups.routes.js";
 import foldersRoute from "./folders.routes.js";
 import usergroupsRoute from "./usergroups.js";
+import googleRoutes from "./google.routes.js";
 
 export {
   solicitudRoutes,
@@ -49,5 +50,6 @@ export {
   minioRoutes,
   groupsRoutes,
   foldersRoute,
-  usergroupsRoute
+  usergroupsRoute,
+  googleRoutes,
 };
