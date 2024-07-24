@@ -54,13 +54,15 @@ const getEmpleadoState = async (req = request, res = response) => {
   const booleanValue = documentsFilter === 'true' ? true : false;
   const query = documentsFilter === '' ? { [Sequelize.Op.ne]: null } : { [Sequelize.Op.eq]: booleanValue } ;
 
+  console.log(documentsFilter === 'null' ? false : true)
+
   try {
     const registroEmpleados = await registroEmpleado.findAll({
       where:whereEstado,
       include: [
         {
           model: RegistroDocumento,
-          required: true,
+          required: documentsFilter === 'null' ? false : true,
           where: { estado: query  }
         }
       ]
