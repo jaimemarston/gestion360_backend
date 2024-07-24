@@ -1,4 +1,4 @@
-import { Folders, MinioFiles } from '../../models/index.js';
+import { Folders } from '../../models/index.js';
 import { getFolderWithParents } from '../../utils/index.js';
 
 const checkParentFolder = async (req, res, next) => {
@@ -8,11 +8,6 @@ const checkParentFolder = async (req, res, next) => {
     const parent = await Folders.findByPk(req.body.parent);
     if (parent === null) {
       return res.status(404).send({ message: 'Carpeta padre no encontrada' })
-    }
-
-    const filesInFolder = await MinioFiles.findOne({ where: { FolderId: req.body.parent } });
-    if (filesInFolder !== null) {
-      return res.status(400).send({ message: 'No puedes crear una carpeta en otra donde hay archivos' })
     }
 
     const getFolderWithParentsResult = await getFolderWithParents(req.body.parent);
