@@ -2,6 +2,8 @@ import { request, response } from 'express';
 import {  RegistroDocumento, registroEmpleado } from '../models/index.js';
 import empleadoService from '../services/empleado.service.js';
 import userService from '../services/user.service.js';
+import { Sequelize } from "sequelize";
+
 const addEmpleado = async (req = request, res = response) => {
   try {
 
@@ -25,11 +27,7 @@ const getEmpleado = async (req = request, res = response) => {
   try {
 
     const registroEmpleados = await registroEmpleado.findAll({
-      include: [
-        {
-          model: RegistroDocumento
-        }
-      ]
+      include: [ { model: RegistroDocumento } ]
     })
     res
     .status(201)
@@ -52,14 +50,18 @@ const getEmpleadoState = async (req = request, res = response) => {
     whereEstado.estado = false;
   }
 
+  const documentsFilter = req.query.documentsFilter;
+  const booleanValue = documentsFilter === 'true' ? true : false;
+  const query = documentsFilter === '' ? { [Sequelize.Op.ne]: null } : { [Sequelize.Op.eq]: booleanValue } ;
 
   try {
-
     const registroEmpleados = await registroEmpleado.findAll({
       where:whereEstado,
       include: [
         {
-          model: RegistroDocumento
+          model: RegistroDocumento,
+          required: false,
+          where: { estado: query  }
         }
       ]
     })
