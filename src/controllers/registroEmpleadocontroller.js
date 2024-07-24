@@ -60,7 +60,7 @@ const getEmpleadoState = async (req = request, res = response) => {
       include: [
         {
           model: RegistroDocumento,
-          required: false,
+          required: true,
           where: { estado: query  }
         }
       ]
