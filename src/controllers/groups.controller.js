@@ -59,6 +59,7 @@ const getAll = async (req, res) => {
 
     let allFolders = await Folders.findAll({
         include: [{
+            required: false,
             model: Groups,
             as: 'Group',
             where: yearCondition
@@ -76,6 +77,7 @@ const getAll = async (req, res) => {
           foldersMap[folder.parent].dataValues.children.push(folder);
       }
     });
+
 
     const formattedFolders = allFolders.map(formatFolder);
 
