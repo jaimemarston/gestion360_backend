@@ -25,6 +25,7 @@ import {
   foldersRoute,
   usergroupsRoute,
   googleRoutes,
+  statusRoutes,
 } from '../routes/index.js';
 
 class Server {
@@ -87,11 +88,13 @@ this.app.use(this.prefix, registroCodigosReferencia);
 this.app.use(this.prefix, userRoutes); 
 this.app.use(this.prefix, registroPresupuestoFinanciero);
 this.app.use(this.prefix, registroPresupuesto);
+this.app.use(this.prefix, statusRoutes)
 this.app.use(`${this.prefix}/minio`, minioRoutes)
 this.app.use(`${this.prefix}/groups`, groupsRoutes)
 this.app.use(`${this.prefix}/folders`, foldersRoute)
 this.app.use(`${this.prefix}/usergroups`, usergroupsRoute)
 this.app.use(`${this.prefix}/google`, googleRoutes)
+
 
   }
   listen() {

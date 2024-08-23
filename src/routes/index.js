@@ -29,6 +29,7 @@ import groupsRoutes from "./groups.routes.js";
 import foldersRoute from "./folders.routes.js";
 import usergroupsRoute from "./usergroups.js";
 import googleRoutes from "./google.routes.js";
+import statusRoutes from "./status.routes.js";
 
 export {
   solicitudRoutes,
@@ -52,4 +53,5 @@ export {
   foldersRoute,
   usergroupsRoute,
   googleRoutes,
+  statusRoutes,
 };
