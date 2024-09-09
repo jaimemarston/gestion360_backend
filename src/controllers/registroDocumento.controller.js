@@ -462,7 +462,7 @@ try {
   const image = await pdfDoc.embedJpg(imageBytes);
   page.drawImage(image, {
     x: 180,
-    y: 140,
+    y: 135,
     width: 100,
     height: 45,
   });
