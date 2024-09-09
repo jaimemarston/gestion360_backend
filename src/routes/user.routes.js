@@ -28,6 +28,7 @@ router.put('/updatePassword', validarJWT,  haveRol('ADMIN_ROLE', 'USER_ROLE',), 
 
 router.delete(
   '/usuario/:id',
+  validarJWT,
   haveRol('ADMIN_ROLE'),
   userDelete
 );
