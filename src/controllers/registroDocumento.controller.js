@@ -301,8 +301,10 @@ const fechaActualString = () => {
       const fechaBoleta = docName.split('_')[2].split('.')[0];
       const year = fechaBoleta.slice(0, 4);
       const month = fechaBoleta.slice(4, 6);
-      const day = "03";
-      const date = new Date(year, parseInt(month), day);
+      const dayInDocument = fechaBoleta.slice(6, 8);
+      const currentDay = new Date().getDate().toString().padStart(2, '0');
+      const day = dayInDocument || currentDay;
+      const date = new Date(year, parseInt(month) - 1, parseInt(day));
       let fechaEnvio = date.toLocaleDateString("es-ES").replace(/\//g, '-');
       fechaEnvio = fechaEnvio.split('-').map(part => part.padStart(2, '0')).join('-');
 
