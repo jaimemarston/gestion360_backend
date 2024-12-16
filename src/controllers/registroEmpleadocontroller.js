@@ -54,9 +54,19 @@ const getEmpleadoState = async (req = request, res = response) => {
     whereEstado.estado = estado === 'activo';
   }
 
-  const documentsFilter = req.query.documentsFilter;
-  const booleanValue = documentsFilter === 'true';
-  const query = documentsFilter === '' ? { [Sequelize.Op.ne]: null } : { [Sequelize.Op.eq]: booleanValue } ;
+  const { documentsFilter, firmedStatus} = req.query;
+  const filterDocument = documentsFilter !== 'todos'
+
+  const queryDocument = {
+    where: {
+      tipodoc : {
+        [Sequelize.Op.eq]: documentsFilter
+      },
+      estado: {
+        [Sequelize.Op.eq]: firmedStatus === 'true'
+      },
+    }
+  };
 
   try {
     const registroEmpleados = await registroEmpleado.findAll({
@@ -64,8 +74,8 @@ const getEmpleadoState = async (req = request, res = response) => {
       include: [
         {
           model: RegistroDocumento,
-          required: Boolean(documentsFilter),
-          where: { estado: query  }
+          required: filterDocument,
+          ...( filterDocument ? queryDocument : {} ),
         }
       ]
     })

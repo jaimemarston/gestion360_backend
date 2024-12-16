@@ -294,7 +294,6 @@ const fechaActualString = () => {
     });
 
     const docs = await Promise.all(promises);
-    console.log('docs:', docs);
 
     const documentsData = docs.map((docData) => {
       const docName = docData.name.replace('documents/', '');
@@ -318,13 +317,6 @@ const fechaActualString = () => {
       };
       return doc;
     });
-
-/*     const empleado = await registroEmpleado.findAll();
-
-    const documentosValidos = documentsData.filter((documento) =>
-      empleado.some((empleado) => empleado.docIdentidad === documento.ndocumento)
-    );
- */
 
 const repeatedElements = [];
 const docsToInsert = [];
@@ -351,7 +343,7 @@ for (const element of documentsData) {
         docsToInsert.push(element);
       }
     } else {
-      console.log(`El ndocumento ${element.ndocumento} no existe en la tabla registroEmpleados.`);
+      console.error(`El ndocumento ${element.ndocumento} no existe en la tabla registroEmpleados.`);
     }
   }
 }
@@ -387,8 +379,10 @@ const addAllFirm = async (req = request, res = response) => {
         const fechaBoleta = docData.originalname.split('_')[3].split('.')[0];
         const year = fechaBoleta.slice(0, 4);
         const month = fechaBoleta.slice(4, 6);
-        const day = "01"; 
-        const date = new Date(year, parseInt(month) - 1, day);
+        const dayInDocument = fechaBoleta.slice(6, 8);
+        const currentDay = new Date().getDate().toString().padStart(2, '0');
+        const day = dayInDocument || currentDay;
+        const date = new Date(year, parseInt(month) - 1, parseInt(day));
         let fechaEnvio = date.toLocaleDateString("es-ES").replace(/\//g, '-');
         fechaEnvio = fechaEnvio.split('-').map(part => part.padStart(2, '0')).join('-');
         const doc = {
@@ -450,8 +444,20 @@ const regDoc = await RegistroDocumento.bulkCreate(documentosValidos, {
 
 };
 
-const firmarDoc = async (req,res,next) => {
+const firmarDoc = async (req, res) => {
   const {user,doc} = req.body
+  const { type } = req.query;
+  const coordenates = {
+    x: 180,
+    y: 135,
+    width: 100,
+    height: 45,
+  }
+
+  if (type && type === 'Cts') {
+    coordenates.x = 390;
+    coordenates.y = 150;
+  }
 
 try {
 
@@ -462,12 +468,7 @@ try {
   // Agrega la imagen como un sello en la página
   const imageBytes = await fileService.getFileBytes(`firmas/${user?.imgfirma}.jpg`)
   const image = await pdfDoc.embedJpg(imageBytes);
-  page.drawImage(image, {
-    x: 180,
-    y: 135,
-    width: 100,
-    height: 45,
-  });
+  page.drawImage(image, coordenates);
 
    const newPdf = await  pdfDoc.save()    
 
@@ -504,9 +505,9 @@ const uploadfile = async (req, res, next) => {
 
   const extension = file.path.split('.');
   console.log('path=>', extension[1].toLowerCase());
-  if (extension[1].toLowerCase() !== 'jpg') {
-    return res.status(404).json({ message: 'Formato no permitido' });
-  }
+  // if (extension[1].toLowerCase() !== 'jpg') {
+  //   return res.status(404).json({ message: 'Formato no permitido' });
+  // }
 
   const firmaImc = 'firma_';
   const firmaComp = `${firmaImc}${dni}`;
