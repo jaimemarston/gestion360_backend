@@ -52,6 +52,10 @@ nomfile: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
+  certified: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  }
 }, {
   tableName: 'registroDocumentos',
   indexes: [

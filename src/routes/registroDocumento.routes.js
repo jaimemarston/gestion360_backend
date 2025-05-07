@@ -12,7 +12,8 @@ import {
   uploadfile,
   getBoletasMay,
   setFirmas,
-  descargarDocumentosPorIds
+  descargarDocumentosPorIds,
+  certifyDocument
 } from '../controllers/registroDocumento.controller.js';
 import { validarJWT, haveRol } from '../middleware/index.js';
 import multer from "multer";
@@ -74,6 +75,7 @@ router.post('/regdocAddAll', upload.array('file'), cargamasivaDeBoletas);
 router.post('/regdocfirmAddAll', uploadDocFirm.array('file'), addAllFirm); 
 router.post('/subir_firma/:dni', uploadFirm.single('image'), uploadfile);
 router.post('/firmar_doc', validarJWT, haveRol('ADMIN_ROLE', 'USER_ROLE'), firmarDoc);
+router.put('/regDoc/certify/:docId', certifyDocument)
 router.put('/regdoc/:id', validarJWT, haveRol('ADMIN_ROLE', 'USER_ROLE'), lugarUpdate);
 router.delete('/regdoc/:id', validarJWT, haveRol('ADMIN_ROLE', 'USER_ROLE'), lugarDelete);
 router.delete('/regdocBloque', validarJWT, haveRol('ADMIN_ROLE', 'USER_ROLE'), lugarBlockDelete);
