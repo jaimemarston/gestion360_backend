@@ -301,11 +301,14 @@ const fechaActualString = () => {
       const fechaBoleta = docName.split('_')[2].split('.')[0];
       const year = fechaBoleta.slice(0, 4);
       const month = fechaBoleta.slice(4, 6);
-      const day = "03";
-      const date = new Date(year, parseInt(month), day);
-      let fechaEnvio = date.toLocaleDateString("es-ES").replace(/\//g, '-');
-      fechaEnvio = fechaEnvio.split('-').map(part => part.padStart(2, '0')).join('-');
-
+      
+      // Obtener el día actual si no está en el nombre del archivo
+      const currentDate = new Date();
+      const day = fechaBoleta.length > 6 ? fechaBoleta.slice(6, 8) : String(currentDate.getDate()).padStart(2, '0');
+    
+      // Crear la fecha de envío
+      const fechaEnvio = `${day}-${month}-${year}`;
+    
       const doc = {
         tipodoc: docName.split("_")[0],
         nombredoc: docName,
@@ -653,6 +656,33 @@ const descargarDocumentosPorIds = async (req, res) => {
   }
 };
 
+const certifyDocument = async (req, res) => {
+  const { docId } = req.params;
+  try {
+    const registroDocumento = await RegistroDocumento.findByPk(docId);
+    if (!registroDocumento) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'El documento no existe' 
+      });
+    }
+    const updatedDoc = await registroDocumento.update({ certified: true });
+    
+    return res.status(200).json({ 
+      success: true,
+      message: 'Documento certificado correctamente', 
+      data: updatedDoc 
+    });
+  } catch (error) {
+    console.error('Error al certificar el documento:', error);
+    return res.status(500).json({ 
+      success: false,
+      message: 'Error al certificar el documento',
+      error: error.message 
+    });
+  }
+};
+
 
 
 export {
@@ -668,5 +698,6 @@ export {
   firmarDoc,
   getBoletasMay,
   setFirmas,
-  descargarDocumentosPorIds
+  descargarDocumentosPorIds,
+  certifyDocument,
 };
