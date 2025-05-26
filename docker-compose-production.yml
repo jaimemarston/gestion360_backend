@@ -1,0 +1,24 @@
+services:
+  app:
+    build: .
+    volumes:
+      - './:/app'
+    image: app
+    deploy:
+      replicas: 1
+      mode: replicated
+      restart_policy:
+        condition: on-failure
+        delay: 20s
+        window: 120s
+    restart: unless-stopped
+    ports:
+      - '4000:4000'
+      - '9229:9229'
+    command: ["node", "--inspect=0.0.0.0:9229", "index.js"]
+    environment:
+      VIRTUAL_PORT: 3000
+      VIRTUAL_HOST: ${DOMAIN}
+      LETSENCRYPT_HOST: ${DOMAIN}
+      LETSENCRYPT_EMAIL: arianvaldivieso@gmail.com
+
