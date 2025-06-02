@@ -284,6 +284,7 @@ const fechaActualString = () => {
 
   try {
     const files = req.files;
+    const updloadDate = req.body?.date ?? null;
 
     const promises = files.map(async (file) => {
       const fileContent = fs.readFileSync(file.path);
@@ -305,7 +306,7 @@ const fechaActualString = () => {
       const day = fechaBoleta.length > 6 ? fechaBoleta.slice(6, 8) : String(currentDate.getDate()).padStart(2, '0');
     
       // Crear la fecha de envío
-      const fechaEnvio = `${day}-${month}-${year}`;
+      const fechaEnvio = updloadDate ? updloadDate : `${day}-${month}-${year}`;
     
 
       const doc = {
@@ -374,6 +375,7 @@ const addAllFirm = async (req = request, res = response) => {
   try {
 
     const files = req.files
+    const uploadDate = req.body?.date ?? null;
 
     const documentsData = files.map((docData) => {
       if(docData.originalname.split("_")[0] === 'firmado'){
@@ -390,8 +392,8 @@ const addAllFirm = async (req = request, res = response) => {
           tipodoc: docData.originalname.split("_")[1],
           nombredoc:docData.originalname.replace('firmado_', ''),
           ndocumento: docData.originalname.split("_")[2],
-          fechaenvio: fechaEnvio,
-          fechafirma: fechaEnvio,
+          fechaenvio: uploadDate ? uploadDate : fechaEnvio,
+          fechafirma: uploadDate ? uploadDate : fechaEnvio,
           estado: true
     
         }
@@ -408,8 +410,8 @@ const addAllFirm = async (req = request, res = response) => {
           tipodoc: docData.originalname.split("_")[0],
           nombredoc:docData.originalname,
           ndocumento: docData.originalname.split("_")[1],
-          fechaenvio: fechaEnvio,
-          fechafirma: fechaEnvio,
+          fechaenvio: uploadDate ? uploadDate : fechaEnvio,
+          fechafirma: uploadDate ? uploadDate : fechaEnvio,
           estado: true
     
         }
