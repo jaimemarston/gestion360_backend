@@ -70,13 +70,21 @@ const getEmpleadoState = async (req = request, res = response) => {
 
   try {
     const registroEmpleados = await registroEmpleado.findAll({
-      ...( estado !== 'todos'? whereEstado : {} ),
+      where: whereEstado,
       include: [
         {
           model: RegistroDocumento,
-          required: filterDocument,
-          ...( filterDocument ? queryDocument : {} ),
+          required: documentsFilter === 'null' ? false : true,
+          where: { estado: query },
+          order: [
+            ['estado', 'ASC'],
+            ['certified', 'ASC']
+          ]
         }
+      ],
+      order: [
+        [{ model: RegistroDocumento }, 'estado', 'ASC'],
+        [{ model: RegistroDocumento }, 'certified', 'ASC']
       ]
     })
     res
@@ -98,8 +106,16 @@ const getEmpleadoByDni = async (req = request, res = response) => {
       where:{ndocumento:dni},
       include: [
         {
-          model: RegistroDocumento
+          model: RegistroDocumento,
+          order: [
+            ['estado', 'ASC'],
+            ['certified', 'ASC']
+          ]
         }
+      ],
+      order: [
+        [{ model: RegistroDocumento }, 'estado', 'ASC'],
+        [{ model: RegistroDocumento }, 'certified', 'ASC']
       ]
     })
     res
