@@ -40,61 +40,52 @@ const getEmpleado = async (req = request, res = response) => {
 };
 
 const getEmpleadoState = async (req = request, res = response) => {
-
   const { estado } = req.params;
-  let whereEstado = {
-    where: {
-      estado: {
-        [Sequelize.Op.eq]: estado === 'activo'
-      }
-    }
-  };
+  const { documentsFilter, firmedStatus } = req.query;
 
+  let whereEstado = {};
   if (estado === 'activo' || estado === 'inactivo') {
     whereEstado.estado = estado === 'activo';
   }
 
-  const { documentsFilter, firmedStatus} = req.query;
-  const filterDocument = documentsFilter !== 'todos'
-
-  const queryDocument = {
-    where: {
-      tipodoc : {
-        [Sequelize.Op.eq]: documentsFilter
-      },
-      estado: {
-        [Sequelize.Op.eq]: firmedStatus === 'true'
-      },
-    }
+  let includeOptions = {
+    model: RegistroDocumento,
+    required: documentsFilter !== 'todos',
   };
+
+  if (documentsFilter !== 'todos') {
+    includeOptions.where = { tipodoc: documentsFilter };
+  }
+
+  if (firmedStatus !== 'todos') {
+    includeOptions.where = {
+      ...includeOptions.where,
+      estado: firmedStatus === 'true'
+    };
+  }
 
   try {
     const registroEmpleados = await registroEmpleado.findAll({
       where: whereEstado,
-      include: [
-        {
-          model: RegistroDocumento,
-          required: documentsFilter === 'null' ? false : true,
-          where: { estado: query },
-          order: [
-            ['estado', 'ASC'],
-            ['certified', 'ASC']
-          ]
-        }
-      ],
+      include: [includeOptions],
       order: [
         [{ model: RegistroDocumento }, 'estado', 'ASC'],
         [{ model: RegistroDocumento }, 'certified', 'ASC']
       ]
-    })
-    res
-    .status(201)
-    .json({ message: 'Se han encontrado empleados con éxito', registroEmpleados });
+    });
+
+    res.status(200).json({ 
+      message: 'Se han encontrado empleados con éxito', 
+      registroEmpleados 
+    });
     
   } catch (error) {
-    res.status(400).json({ message: 'hable con el administrador', error });
+    console.error('Error en getEmpleadoState:', error);
+    res.status(400).json({ 
+      message: 'Hubo un error al procesar la solicitud', 
+      error: error.message 
+    });
   }
-
 };
 
 const getEmpleadoByDni = async (req = request, res = response) => {
