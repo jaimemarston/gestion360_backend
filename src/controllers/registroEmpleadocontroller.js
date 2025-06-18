@@ -69,8 +69,15 @@ const getEmpleadoState = async (req = request, res = response) => {
       where: whereEstado,
       include: [includeOptions],
       order: [
-        [{ model: RegistroDocumento }, 'estado', 'ASC'],
-        [{ model: RegistroDocumento }, 'certified', 'ASC']
+        [RegistroDocumento, 'estado', 'ASC'],
+        [RegistroDocumento, 'certified', 'ASC'],
+        [
+          Sequelize.fn('TO_DATE', 
+            Sequelize.col('registroDocumentos.fechaenvio'), 
+            'DD-MM-YYYY'
+          ),
+          'DESC'
+        ]
       ]
     });
 
@@ -106,7 +113,14 @@ const getEmpleadoByDni = async (req = request, res = response) => {
       ],
       order: [
         [{ model: RegistroDocumento }, 'estado', 'ASC'],
-        [{ model: RegistroDocumento }, 'certified', 'ASC']
+        [{ model: RegistroDocumento }, 'certified', 'ASC'],
+        [
+          Sequelize.fn('TO_DATE', 
+            Sequelize.col('registroDocumentos.fechaenvio'), 
+            'DD-MM-YYYY'
+          ),
+          'DESC'
+        ]
       ]
     })
     res
