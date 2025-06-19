@@ -2,8 +2,11 @@ import { Folders, Groups, MinioFiles, FoldersUsers, Usuario, UserGroup } from '.
 import { USER_ROLE } from '../utils/enums/user-role.enum.js'
 import { v4 as uuidv4 } from 'uuid';
 import { sequelize as Sequelize } from '../database/db.js';
+import { Sequelize as Seq } from "sequelize";
 
 function formatObject(group) {
+  if (!group) return null;
+
   return {
     id: group.id,
     uuid: group.uuid,
@@ -57,14 +60,25 @@ const getAll = async (req, res) => {
     ? Sequelize.where(Sequelize.fn('EXTRACT', Sequelize.literal(`YEAR FROM "Group"."createdAt"`)), yearFilterParam)
     : {};
 
-    let allFolders = await Folders.findAll({
-        include: [{
-            required: false,
-            model: Groups,
-            as: 'Group',
-            where: yearCondition
-        }]
-    });
+
+  let allFolders = await Folders.findAll({
+      include: [{
+          required: false,
+          model: Groups,
+          as: 'Group'
+      }],
+      where: {
+          [Seq.Op.or]: [
+              { GroupId: null },
+              yearFilterParam
+                  ? Sequelize.where(
+                      Sequelize.fn('EXTRACT', Sequelize.literal(`YEAR FROM "Group"."createdAt"`)),
+                      yearFilterParam
+                    )
+                  : {}
+          ]
+      }
+  });
 
     let foldersMap = {};
     allFolders.forEach(folder => {
@@ -72,14 +86,20 @@ const getAll = async (req, res) => {
         folder.dataValues.children = [];
     });
 
+
     allFolders.forEach(folder => {
       if (folder.parent) {
-          foldersMap[folder.parent].dataValues.children.push(folder);
+          if (foldersMap[folder.parent]) {
+              foldersMap[folder.parent].dataValues.children.push(folder);
+          } else {
+              console.warn(`Parent folder with id ${folder.parent} not found for folder ${folder.id}`);
+          }
       }
     });
 
 
     const formattedFolders = allFolders.map(formatFolder);
+
 
     let filteredFolders = formattedFolders.filter(folder => folder.parent === null)
 

@@ -6,7 +6,7 @@ const checkId = async (req, res, next) => {
     return res.status(400).send({ message: 'El ID es requerido' })
   }
 
-  const group = await UserGroup.findByPk(+req.params.id);
+  const group = await Groups.findByPk(+req.params.id);
   if (!group) {
     return res.status(404).send({ message: 'Grupo no encontrado' })
   }
